@@ -4,7 +4,7 @@
 
 This file is the running test ledger for the project. It defines the tests required for the Overleaf-like AI diagram feature and records execution results over time.
 
-Current status: TASK-014 structured patch applier has been implemented. OpenRouter-dependent live calls are intentionally pending until an API key is provided.
+Current status: TASK-015 diagram preview and approval has been implemented. OpenRouter-dependent live calls are intentionally pending until an API key is provided.
 
 ## Test Environment
 
@@ -33,10 +33,30 @@ Future implementation environment:
 | PRD artifact creation | Passed | `docs/PRD_AGENTIC_LATEX_DIAGRAM_EDITOR.md` created. |
 | Progress tracker creation | Passed | `docs/TASK_PROGRESS.diff` created. |
 | Test ledger creation | Passed | `docs/TEST_RESULTS.md` created. |
-| Application unit tests | Passed | TASK-007 through TASK-014 tests validate shell, Monaco, context menu, dialog semantics, validation, model provider interface, OpenRouter adapter, compiler sandbox contract, LaTeX log parsing, repair state-machine transitions, structured patch application, rollback, path rejection, z-index scale, responsive CSS, and typography guardrails. |
+| Application unit tests | Passed | TASK-007 through TASK-015 tests validate shell, Monaco, context menu, dialog semantics, validation, model provider interface, OpenRouter adapter, compiler sandbox contract, LaTeX log parsing, repair state-machine transitions, structured patch application, rollback, path rejection, preview approval state, approval actions, z-index scale, responsive CSS, and typography guardrails. |
 | Compiler sandbox tests | Passed | TASK-011 structure tests validate standalone wrapper, per-job temp workspace, Docker network isolation args, no-shell-escape latexmk flags, timeout kill behavior, and artifact/log capture paths. |
 | Agent repair tests | Passed | TASK-013 and TASK-014 tests cover observation, diagnosis, patch planning, structured patch validation/application, rollback, recompilation handoff, preview readiness, repeated-error escalation, and user revision branching. |
-| E2E UI tests | Partial | Playwright smoke checked desktop/mobile shell rendering, TASK-008 right-click/toolbar context menu interaction, and TASK-009 dialog validation/submission. Model-backed generation is pending provider implementation. |
+| E2E UI tests | Partial | Playwright smoke checked desktop/mobile shell rendering, TASK-008 right-click/toolbar context menu interaction, and TASK-009 dialog validation/submission. TASK-015 has static UI guard coverage for preview approval; model-backed generation remains pending provider credentials. |
+
+## Latest Execution: TASK-015 Diagram Preview And Approval
+
+Date: 2026-05-30
+
+Commands:
+
+- `npm test` - Passed.
+- `npm run typecheck` - Passed.
+- `npm run lint` - Passed.
+- `npm run build` - Passed.
+
+Notes:
+
+- Added typed preview approval state for ready, kept, changes-requested, and discarded outcomes.
+- Submitting a diagram request now creates a keyless compiled-preview checkpoint instead of calling OpenRouter.
+- Preview displays a rendered diagram surface, accessible summary, repair/change summary, and collapsible source preview.
+- Approval checkpoint asks "Does this match what you wanted?" and exposes Keep Diagram, Request Changes, and Discard actions.
+- Approval decisions update the status rail and lock the decision buttons after a choice.
+- Local browser smoke was attempted, but the sandboxed browser launch was denied by macOS permissions and the follow-up escalated attempt was stopped when the approval system reported the workspace was out of credits. Static UI guards plus build/type/lint/test coverage passed.
 
 ## Latest Execution: TASK-014 Structured Patch Applier
 

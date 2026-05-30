@@ -13,3 +13,17 @@ export type AgentEvent = {
   detail: string;
   state: "complete" | "current" | "pending" | "warning";
 };
+
+export type DiagramPreviewStatus = "ready" | "kept" | "changes-requested" | "discarded";
+
+export type DiagramPreviewApproval = {
+  id: string;
+  prompt: string;
+  artifactPath: string;
+  sourcePath: string;
+  source: string;
+  accessibleSummary: string;
+  repairSummary: string;
+  changes: string[];
+  status: DiagramPreviewStatus;
+};

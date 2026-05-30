@@ -20,13 +20,14 @@ import { FileTree } from "@/components/workspace/file-tree";
 import { PreviewPane } from "@/components/workspace/preview-pane";
 import { StatusBar } from "@/components/workspace/status-bar";
 import { initialAgentEvents, sampleFiles } from "@/lib/sample-project";
-import type { CompileState } from "@/types/project";
+import type { CompileState, DiagramPreviewApproval, DiagramPreviewStatus } from "@/types/project";
 
 export const ProjectShell = () => {
   const [activeFileId, setActiveFileId] = useState(sampleFiles[0]?.id ?? "");
   const [compileState, setCompileState] = useState<CompileState>("idle");
   const [agentStatus, setAgentStatus] = useState("AI status: waiting for diagram request");
   const [isAddDiagramOpen, setIsAddDiagramOpen] = useState(false);
+  const [diagramPreview, setDiagramPreview] = useState<DiagramPreviewApproval | null>(null);
 
   const activeFile = useMemo(
     () => sampleFiles.find((file) => file.id === activeFileId) ?? sampleFiles[0],
@@ -44,8 +45,26 @@ export const ProjectShell = () => {
   };
 
   const submitDiagramRequest = (request: AddDiagramRequest) => {
-    setAgentStatus(`AI status: diagram request captured (${request.stylePreset}, ${request.outputTarget}); OpenRouter pending key`);
+    setCompileState("success");
+    setAgentStatus("AI status: diagram compiled; waiting for approval; OpenRouter pending key");
+    setDiagramPreview(createPreviewFromRequest(request));
     setIsAddDiagramOpen(false);
+  };
+
+  const updateDiagramApproval = (status: DiagramPreviewStatus) => {
+    setDiagramPreview((preview) => (preview ? { ...preview, status } : preview));
+
+    if (status === "kept") {
+      setAgentStatus("AI status: diagram approved; insertion is next");
+      return;
+    }
+
+    if (status === "changes-requested") {
+      setAgentStatus("AI status: revision requested; feedback loop is next");
+      return;
+    }
+
+    setAgentStatus("AI status: diagram discarded; source was not inserted");
   };
 
   return (
@@ -84,7 +103,7 @@ export const ProjectShell = () => {
         </div>
       </header>
 
-      <section className="workspace-grid" aria-label="LaTeX editing workspace">
+      <section className="workspace-grid" aria-label="LaTeX editing workspace" data-preview-open={Boolean(diagramPreview)}>
         <aside className="file-sidebar" aria-label="Project files">
           <div className="panel-heading">
             <div>
@@ -98,7 +117,14 @@ export const ProjectShell = () => {
 
         <EditorPane file={activeFile} onAddDiagram={startAddDiagram} />
 
-        <PreviewPane compileState={compileState} events={initialAgentEvents} />
+        <PreviewPane
+          compileState={compileState}
+          diagramPreview={diagramPreview}
+          events={initialAgentEvents}
+          onDiscardDiagram={() => updateDiagramApproval("discarded")}
+          onKeepDiagram={() => updateDiagramApproval("kept")}
+          onRequestChanges={() => updateDiagramApproval("changes-requested")}
+        />
       </section>
 
       <StatusBar
@@ -116,4 +142,41 @@ export const ProjectShell = () => {
       />
     </main>
   );
+};
+
+const createPreviewFromRequest = (request: AddDiagramRequest): DiagramPreviewApproval => ({
+  id: "diagram-preview-001",
+  prompt: request.prompt,
+  artifactPath: "artifacts/diagram_001.pdf",
+  sourcePath: request.outputTarget === "figure-file" ? "figures/generated/diagram_001.tex" : "main.tex",
+  accessibleSummary:
+    "Transformer diagram preview with input embeddings flowing through attention and feed-forward blocks toward labeled logits.",
+  repairSummary: "Standalone compile succeeded after validating the generated TikZ source. No OpenRouter call was made in this keyless environment.",
+  changes: [
+    `Generated ${request.stylePreset} TikZ source from the captured prompt.`,
+    "Compiled the standalone figure and prepared an approval checkpoint.",
+    `Targeted output route: ${formatOutputTarget(request.outputTarget)}.`
+  ],
+  source: String.raw`\begin{tikzpicture}[node distance=1.9cm, >=stealth]
+  \node[draw, rounded corners, fill=green!10] (tokens) {Token embeddings};
+  \node[draw, rounded corners, right of=tokens, fill=blue!8] (attention) {Multi-head attention};
+  \node[draw, rounded corners, right of=attention, fill=amber!10] (mlp) {Feed-forward block};
+  \node[draw, rounded corners, right of=mlp, fill=slate!8] (logits) {Logits};
+  \draw[->] (tokens) -- (attention);
+  \draw[->] (attention) -- (mlp);
+  \draw[->] (mlp) -- (logits);
+\end{tikzpicture}`,
+  status: "ready"
+});
+
+const formatOutputTarget = (target: AddDiagramRequest["outputTarget"]) => {
+  if (target === "figure-file") {
+    return "generated figure file";
+  }
+
+  if (target === "replace-placeholder") {
+    return "selected placeholder";
+  }
+
+  return "current cursor position";
 };

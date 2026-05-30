@@ -82,9 +82,11 @@ new file mode 100644
 +    Result: Added structured patch applier with workspace path validation, supported edit operations, before/after records, rollback support, and security events for rejected paths or operations.
 +    Verification: `npm test`, `npm run typecheck`, `npm run lint`, and `npm run build` passed. Fixture tests cover valid replace, rollback, path traversal rejection, absolute path rejection, and append.
 +
-+[ ] TASK-015 Implement diagram preview and approval
++[x] TASK-015 Implement diagram preview and approval
 +    Acceptance: preview ready state asks "Does this match what you wanted?"
 +    Acceptance: Keep Diagram, Request Changes, Discard.
++    Result: Added typed preview approval state, compiled diagram preview surface, accessible summary, repair/change summary, collapsible source preview, and approval actions for Keep Diagram, Request Changes, and Discard.
++    Verification: `npm test`, `npm run typecheck`, `npm run lint`, and `npm run build` passed. Fixture tests cover preview-ready state creation, keyless OpenRouter behavior, approval action wiring, accessible labels/live regions, source preview, and responsive approval styling.
 +
 +[ ] TASK-016 Implement user revision loop
 +    Acceptance: user feedback modifies existing diagram source and reruns compile/repair.
