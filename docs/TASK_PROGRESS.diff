@@ -61,8 +61,10 @@ new file mode 100644
 +    Result: Added provider-neutral `ModelClient`, model request/response/event types, explicit model task schemas, OpenRouter request normalization, OpenRouter provider adapter, environment config, and `.env.example`.
 +    Verification: `npm test`, `npm run typecheck`, `npm run lint`, and `npm run build` passed. Live OpenRouter calls skipped because no API key is provided.
 +
-+[ ] TASK-011 Implement LaTeX compiler sandbox
++[x] TASK-011 Implement LaTeX compiler sandbox
 +    Acceptance: standalone figure compilation with timeout, no shell escape, artifact capture.
++    Result: Added server-side LaTeX compiler sandbox boundary with standalone TikZ wrapper, per-job temporary workspace, Docker TeX Live command builder, network-disabled Docker args, CPU/memory limits, no-shell-escape latexmk flags, timeout-enabled process runner, compile log capture, and artifact inventory.
++    Verification: `npm test`, `npm run typecheck`, `npm run lint`, and `npm run build` passed. Docker/TeX execution was not run in this environment.
 +
 +[ ] TASK-012 Implement LaTeX log parser
 +    Acceptance: extracts errors, file, line, normalized type, source context, and hints.
