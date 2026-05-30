@@ -66,8 +66,10 @@ new file mode 100644
 +    Result: Added server-side LaTeX compiler sandbox boundary with standalone TikZ wrapper, per-job temporary workspace, Docker TeX Live command builder, network-disabled Docker args, CPU/memory limits, no-shell-escape latexmk flags, timeout-enabled process runner, compile log capture, and artifact inventory.
 +    Verification: `npm test`, `npm run typecheck`, `npm run lint`, and `npm run build` passed. Docker/TeX execution was not run in this environment.
 +
-+[ ] TASK-012 Implement LaTeX log parser
++[x] TASK-012 Implement LaTeX log parser
 +    Acceptance: extracts errors, file, line, normalized type, source context, and hints.
++    Result: Added server-side LaTeX log parser with structured error objects, file/line extraction, normalized error types, source context windows, TikZ missing-library hints, and unknown-node mismatch hints.
++    Verification: `npm test`, `npm run typecheck`, `npm run lint`, and `npm run build` passed. Fixture tests cover basic LaTeX errors, missing TikZ positioning library, and unknown TikZ node detection.
 +
 +[ ] TASK-013 Implement agentic repair state machine
 +    Acceptance: observe -> parse -> diagnose -> plan -> patch -> verify loop.

@@ -4,7 +4,7 @@
 
 This file is the running test ledger for the project. It defines the tests required for the Overleaf-like AI diagram feature and records execution results over time.
 
-Current status: TASK-011 LaTeX compiler sandbox boundary has been implemented. OpenRouter-dependent live calls are intentionally pending until an API key is provided.
+Current status: TASK-012 LaTeX log parser has been implemented. OpenRouter-dependent live calls are intentionally pending until an API key is provided.
 
 ## Test Environment
 
@@ -33,10 +33,27 @@ Future implementation environment:
 | PRD artifact creation | Passed | `docs/PRD_AGENTIC_LATEX_DIAGRAM_EDITOR.md` created. |
 | Progress tracker creation | Passed | `docs/TASK_PROGRESS.diff` created. |
 | Test ledger creation | Passed | `docs/TEST_RESULTS.md` created. |
-| Application unit tests | Passed | TASK-007 through TASK-011 structure tests validate shell, Monaco, context menu, dialog semantics, validation, model provider interface, OpenRouter adapter, compiler sandbox contract, z-index scale, responsive CSS, and typography guardrails. |
+| Application unit tests | Passed | TASK-007 through TASK-012 tests validate shell, Monaco, context menu, dialog semantics, validation, model provider interface, OpenRouter adapter, compiler sandbox contract, LaTeX log parsing, z-index scale, responsive CSS, and typography guardrails. |
 | Compiler sandbox tests | Passed | TASK-011 structure tests validate standalone wrapper, per-job temp workspace, Docker network isolation args, no-shell-escape latexmk flags, timeout kill behavior, and artifact/log capture paths. |
 | Agent repair tests | Pending | Agent state machine not implemented yet. |
 | E2E UI tests | Partial | Playwright smoke checked desktop/mobile shell rendering, TASK-008 right-click/toolbar context menu interaction, and TASK-009 dialog validation/submission. Model-backed generation is pending provider implementation. |
+
+## Latest Execution: TASK-012 LaTeX Log Parser
+
+Date: 2026-05-30
+
+Commands:
+
+- `npm test` - Passed.
+- `npm run typecheck` - Passed.
+- `npm run lint` - Passed.
+- `npm run build` - Passed.
+
+Notes:
+
+- Parser returns structured errors with engine, file, line, severity, raw message, normalized type, source context, and repair hints.
+- Fixture coverage includes basic undefined-command errors, missing TikZ positioning library detection, and unknown TikZ node mismatch detection.
+- Compiler sandbox now attaches parsed errors to compile results.
 
 ## Latest Execution: TASK-011 LaTeX Compiler Sandbox
 
@@ -140,7 +157,7 @@ Expected:
 - Parser returns line number.
 - Parser returns concise raw message.
 
-Status: Pending.
+Status: Passed in TASK-012.
 
 ### UT-002: TikZ Missing Library Detection
 
@@ -153,7 +170,7 @@ Expected:
 - Normalized type is `missing_tikz_library` or equivalent.
 - Hint suggests likely `\usetikzlibrary{...}` repair.
 
-Status: Pending.
+Status: Passed in TASK-012.
 
 ### UT-003: Unknown Node Detection
 
@@ -166,7 +183,7 @@ Expected:
 - Normalized type is `unknown_tikz_node`.
 - Source context includes node definitions near the failing line.
 
-Status: Pending.
+Status: Passed in TASK-012.
 
 ### UT-004: Structured Patch Validation
 

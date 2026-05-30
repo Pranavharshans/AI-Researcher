@@ -2,6 +2,7 @@ import { mkdtemp, mkdir, readdir, readFile, stat, writeFile } from "node:fs/prom
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { runProcess } from "@/server/compiler/process-runner";
+import { parseLatexLog } from "@/server/compiler/log-parser";
 import { createStandaloneFigureSource } from "@/server/compiler/standalone";
 import type {
   CompileArtifact,
@@ -90,7 +91,8 @@ export class LatexCompilerSandbox {
     const engine = request.engine ?? "pdflatex";
 
     await mkdir(outputPath, { recursive: true });
-    await writeFile(sourcePath, createStandaloneFigureSource(request.source, { engine }), "utf8");
+    const standaloneSource = createStandaloneFigureSource(request.source, { engine });
+    await writeFile(sourcePath, standaloneSource, "utf8");
 
     const docker = buildDockerLatexCommand({
       workspacePath,
@@ -118,6 +120,11 @@ export class LatexCompilerSandbox {
       stdout: processResult.stdout,
       stderr: processResult.stderr,
       compileLog,
+      parsedErrors: parseLatexLog(compileLog || processResult.stderr, {
+        engine,
+        source: standaloneSource,
+        sourceFilePath: sourceFileName
+      }),
       artifacts
     };
   }
