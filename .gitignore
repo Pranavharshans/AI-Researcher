@@ -1,6 +1,7 @@
 .codex/
 .DS_Store
 node_modules/
+.next/
+tsconfig.tsbuildinfo
 .env
 .env.*
-

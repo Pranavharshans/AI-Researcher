@@ -39,9 +39,11 @@ new file mode 100644
 +[x] TASK-006 Create test plan/results ledger
 +    Output: docs/TEST_RESULTS.md
 +
-+[ ] TASK-007 Scaffold application shell
++[x] TASK-007 Scaffold application shell
 +    Target: Next.js + TypeScript app with Overleaf-like layout.
 +    Acceptance: file tree, Monaco editor, preview panel, compile status bar.
++    Result: Created Next.js App Router shell with file tree, Monaco-backed LaTeX editor, PDF preview panel, AI status rail, compile button, and bottom status bar.
++    Verification: `npm test`, `npm run typecheck`, `npm run lint`, `npm run build`, and Playwright desktop/mobile smoke checks passed.
 +
 +[ ] TASK-008 Implement editor right-click menu
 +    Acceptance: context menu opens on editor right-click and includes "Add diagram".

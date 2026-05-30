@@ -4,7 +4,7 @@
 
 This file is the running test ledger for the project. It defines the tests required for the Overleaf-like AI diagram feature and records execution results over time.
 
-Current status: documentation-only planning artifacts have been created. Application code has not been scaffolded yet, so implementation tests are pending.
+Current status: TASK-007 application shell has been scaffolded. OpenRouter-dependent model behavior is intentionally pending until an API key is provided.
 
 ## Test Environment
 
@@ -33,10 +33,29 @@ Future implementation environment:
 | PRD artifact creation | Passed | `docs/PRD_AGENTIC_LATEX_DIAGRAM_EDITOR.md` created. |
 | Progress tracker creation | Passed | `docs/TASK_PROGRESS.diff` created. |
 | Test ledger creation | Passed | `docs/TEST_RESULTS.md` created. |
-| Application unit tests | Pending | No application code yet. |
+| Application unit tests | Passed | TASK-007 shell structure test validates Next.js, Monaco, file tree/editor/preview/status landmarks, z-index scale, responsive CSS, and typography guardrails. |
 | Compiler sandbox tests | Pending | Compiler service not implemented yet. |
 | Agent repair tests | Pending | Agent state machine not implemented yet. |
-| E2E UI tests | Pending | UI not implemented yet. |
+| E2E UI tests | Partial | Playwright smoke checked desktop and mobile shell rendering; right-click flow is pending TASK-008. |
+
+## Latest Execution: TASK-007 Editor Shell
+
+Date: 2026-05-30
+
+Commands:
+
+- `npm test` - Passed.
+- `npm run typecheck` - Passed.
+- `npm run lint` - Passed.
+- `npm run build` - Passed.
+- Playwright desktop smoke at `1440x900` - Passed: title loaded, shell/editor/status landmarks present, no horizontal overflow.
+- Playwright mobile smoke at `390x844` - Passed: title loaded, shell/editor/status landmarks present, no horizontal overflow.
+
+Notes:
+
+- In-app Browser plugin had no available backend in this session, so Playwright was used for local visual verification.
+- `npm install` reported 4 moderate dependency audit findings. No production code paths were identified from this audit output; detailed security triage remains outside TASK-007.
+- OpenRouter API key is not provided, so provider-backed generation tests remain intentionally skipped.
 
 ## Required Unit Tests
 
@@ -396,4 +415,3 @@ Status: Pending.
 Note for DOC-003:
 
 The documented `uipro init --ai codex --global` command failed because the installed CLI reported `unknown option '--global'`. The fallback command `uipro init --ai codex` succeeded and installed the skill into the current project.
-
