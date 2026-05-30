@@ -4,7 +4,7 @@
 
 This file is the running test ledger for the project. It defines the tests required for the Overleaf-like AI diagram feature and records execution results over time.
 
-Current status: TASK-009 Add Diagram dialog has been implemented. OpenRouter-dependent model behavior is intentionally pending until an API key is provided.
+Current status: TASK-010 model provider abstraction has been implemented. OpenRouter-dependent live calls are intentionally pending until an API key is provided.
 
 ## Test Environment
 
@@ -33,10 +33,28 @@ Future implementation environment:
 | PRD artifact creation | Passed | `docs/PRD_AGENTIC_LATEX_DIAGRAM_EDITOR.md` created. |
 | Progress tracker creation | Passed | `docs/TASK_PROGRESS.diff` created. |
 | Test ledger creation | Passed | `docs/TEST_RESULTS.md` created. |
-| Application unit tests | Passed | TASK-007, TASK-008, and TASK-009 structure tests validate shell, Monaco, context menu, dialog semantics, validation, z-index scale, responsive CSS, and typography guardrails. |
+| Application unit tests | Passed | TASK-007 through TASK-010 structure tests validate shell, Monaco, context menu, dialog semantics, validation, model provider interface, OpenRouter adapter, z-index scale, responsive CSS, and typography guardrails. |
 | Compiler sandbox tests | Pending | Compiler service not implemented yet. |
 | Agent repair tests | Pending | Agent state machine not implemented yet. |
 | E2E UI tests | Partial | Playwright smoke checked desktop/mobile shell rendering, TASK-008 right-click/toolbar context menu interaction, and TASK-009 dialog validation/submission. Model-backed generation is pending provider implementation. |
+
+## Latest Execution: TASK-010 Model Provider Abstraction
+
+Date: 2026-05-30
+
+Commands:
+
+- `npm test` - Passed.
+- `npm run typecheck` - Passed.
+- `npm run lint` - Passed.
+- `npm run build` - Passed.
+
+Notes:
+
+- Added internal `ModelClient` interface, task schemas, model factory, and OpenRouter provider adapter.
+- OpenRouter requests are normalized behind the provider and default to the documented `openrouter/auto` router.
+- Live OpenRouter completion tests were skipped because `OPENROUTER_API_KEY` is not provided.
+- Extra localhost smoke verification was not run for TASK-010 because the approval system reported the workspace was out of credits for the escalated dev-server command.
 
 ## Latest Execution: TASK-009 Add Diagram Dialog
 

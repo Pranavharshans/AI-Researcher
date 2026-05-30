@@ -44,7 +44,7 @@ export const ProjectShell = () => {
   };
 
   const submitDiagramRequest = (request: AddDiagramRequest) => {
-    setAgentStatus(`AI status: diagram request captured (${request.stylePreset}, ${request.outputTarget}); model provider pending`);
+    setAgentStatus(`AI status: diagram request captured (${request.stylePreset}, ${request.outputTarget}); OpenRouter pending key`);
     setIsAddDiagramOpen(false);
   };
 

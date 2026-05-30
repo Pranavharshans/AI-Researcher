@@ -56,8 +56,10 @@ new file mode 100644
 +    Result: Added accessible Add Diagram modal with required prompt textarea, 4,000 character guardrail, style preset selection, output target selection, Cancel, and Generate Diagram.
 +    Verification: `npm test`, `npm run typecheck`, `npm run lint`, `npm run build`, and Playwright dialog validation/submission smoke checks passed.
 +
-+[ ] TASK-010 Implement model provider abstraction
++[x] TASK-010 Implement model provider abstraction
 +    Acceptance: internal ModelClient interface and OpenRouterProvider behind it.
++    Result: Added provider-neutral `ModelClient`, model request/response/event types, explicit model task schemas, OpenRouter request normalization, OpenRouter provider adapter, environment config, and `.env.example`.
++    Verification: `npm test`, `npm run typecheck`, `npm run lint`, and `npm run build` passed. Live OpenRouter calls skipped because no API key is provided.
 +
 +[ ] TASK-011 Implement LaTeX compiler sandbox
 +    Acceptance: standalone figure compilation with timeout, no shell escape, artifact capture.
