@@ -77,8 +77,10 @@ new file mode 100644
 +    Result: Added server-side repair state machine with explicit workflow phases, compile observation handling, evidence-carrying attempts, diagnosis and patch-plan records, recompile verification transitions, repeated-error escalation, failure explanation, acceptance, insertion, main compile, done, and user revision transitions.
 +    Verification: `npm test`, `npm run typecheck`, `npm run lint`, and `npm run build` passed. State-machine fixture tests cover failed compile -> diagnosis -> patch planning -> patch application -> recompile -> preview, repeated-error escalation, and user revision branch.
 +
-+[ ] TASK-014 Implement structured patch applier
++[x] TASK-014 Implement structured patch applier
 +    Acceptance: applies model-proposed edits safely, supports rollback, restricts paths.
++    Result: Added structured patch applier with workspace path validation, supported edit operations, before/after records, rollback support, and security events for rejected paths or operations.
++    Verification: `npm test`, `npm run typecheck`, `npm run lint`, and `npm run build` passed. Fixture tests cover valid replace, rollback, path traversal rejection, absolute path rejection, and append.
 +
 +[ ] TASK-015 Implement diagram preview and approval
 +    Acceptance: preview ready state asks "Does this match what you wanted?"

@@ -1,4 +1,10 @@
 export {
+  PatchValidationError,
+  applyStructuredPatchPlan,
+  rollbackAppliedPatches,
+  validatePatchPlan
+} from "@/server/agent/patch-applier";
+export {
   acceptDiagram,
   createDiagramRepairState,
   defaultRepairSafetyBudget,
@@ -17,6 +23,7 @@ export {
   startSourceGeneration,
   switchRepairStrategy
 } from "@/server/agent/repair-state-machine";
+export type { AppliedPatchRecord, PatchApplyResult, PatchApplyStatus, PatchSecurityEvent } from "@/server/agent/patch-applier";
 export type {
   CompileObservation,
   DiagramRepairPhase,

@@ -4,7 +4,7 @@
 
 This file is the running test ledger for the project. It defines the tests required for the Overleaf-like AI diagram feature and records execution results over time.
 
-Current status: TASK-013 agentic repair state machine has been implemented. OpenRouter-dependent live calls are intentionally pending until an API key is provided.
+Current status: TASK-014 structured patch applier has been implemented. OpenRouter-dependent live calls are intentionally pending until an API key is provided.
 
 ## Test Environment
 
@@ -33,10 +33,29 @@ Future implementation environment:
 | PRD artifact creation | Passed | `docs/PRD_AGENTIC_LATEX_DIAGRAM_EDITOR.md` created. |
 | Progress tracker creation | Passed | `docs/TASK_PROGRESS.diff` created. |
 | Test ledger creation | Passed | `docs/TEST_RESULTS.md` created. |
-| Application unit tests | Passed | TASK-007 through TASK-013 tests validate shell, Monaco, context menu, dialog semantics, validation, model provider interface, OpenRouter adapter, compiler sandbox contract, LaTeX log parsing, repair state-machine transitions, z-index scale, responsive CSS, and typography guardrails. |
+| Application unit tests | Passed | TASK-007 through TASK-014 tests validate shell, Monaco, context menu, dialog semantics, validation, model provider interface, OpenRouter adapter, compiler sandbox contract, LaTeX log parsing, repair state-machine transitions, structured patch application, rollback, path rejection, z-index scale, responsive CSS, and typography guardrails. |
 | Compiler sandbox tests | Passed | TASK-011 structure tests validate standalone wrapper, per-job temp workspace, Docker network isolation args, no-shell-escape latexmk flags, timeout kill behavior, and artifact/log capture paths. |
-| Agent repair tests | Partial | TASK-013 state-machine tests cover observation, diagnosis, patch planning, patch application handoff, recompilation, preview readiness, repeated-error escalation, and user revision branching. Structured patch application is pending TASK-014. |
+| Agent repair tests | Passed | TASK-013 and TASK-014 tests cover observation, diagnosis, patch planning, structured patch validation/application, rollback, recompilation handoff, preview readiness, repeated-error escalation, and user revision branching. |
 | E2E UI tests | Partial | Playwright smoke checked desktop/mobile shell rendering, TASK-008 right-click/toolbar context menu interaction, and TASK-009 dialog validation/submission. Model-backed generation is pending provider implementation. |
+
+## Latest Execution: TASK-014 Structured Patch Applier
+
+Date: 2026-05-30
+
+Commands:
+
+- `npm test` - Passed.
+- `npm run typecheck` - Passed.
+- `npm run lint` - Passed.
+- `npm run build` - Passed.
+
+Notes:
+
+- Added workspace-root validation before any patch is applied.
+- Supported structured edit operations: replace, insert before, insert after, and append.
+- Patch results record before/after content for every applied edit.
+- Rollback restores already-applied edits if a later edit fails.
+- Path traversal and absolute paths are rejected with security events before file writes.
 
 ## Latest Execution: TASK-013 Agentic Repair State Machine
 
@@ -54,7 +73,7 @@ Notes:
 - Added explicit phases for the documented workflow and failure/revision branches.
 - The state machine stores parsed compiler errors, diagnosis evidence, patch plans, resulting source, artifact paths, and timeline events.
 - Repeated compiler error fingerprints trigger `NEEDS_ESCALATION` instead of blind retry.
-- Actual structured file patch application is intentionally left to TASK-014.
+- Structured file patch application is handled by TASK-014.
 
 ## Latest Execution: TASK-012 LaTeX Log Parser
 
@@ -215,7 +234,7 @@ Expected:
 - Patch applies.
 - Patch result is recorded.
 
-Status: Pending.
+Status: Passed in TASK-014.
 
 ### UT-005: Patch Path Rejection
 
@@ -229,7 +248,7 @@ Expected:
 - No file is modified.
 - Security event is recorded.
 
-Status: Pending.
+Status: Passed in TASK-014.
 
 ### UT-006: Repeated Error Escalation
 
