@@ -45,9 +45,11 @@ new file mode 100644
 +    Result: Created Next.js App Router shell with file tree, Monaco-backed LaTeX editor, PDF preview panel, AI status rail, compile button, and bottom status bar.
 +    Verification: `npm test`, `npm run typecheck`, `npm run lint`, `npm run build`, and Playwright desktop/mobile smoke checks passed.
 +
-+[ ] TASK-008 Implement editor right-click menu
++[x] TASK-008 Implement editor right-click menu
 +    Acceptance: context menu opens on editor right-click and includes "Add diagram".
 +    Acceptance: keyboard accessible, Escape closes, no layout overlap.
++    Result: Added editor-scoped custom context menu with Add diagram, disabled future actions, Escape/outside close behavior, arrow-key navigation, and toolbar fallback for touch/keyboard users.
++    Verification: `npm test`, `npm run typecheck`, `npm run lint`, `npm run build`, and Playwright right-click/toolbar smoke checks passed.
 +
 +[ ] TASK-009 Implement Add Diagram dialog
 +    Acceptance: prompt entry, style preset, generate/cancel buttons, validation.

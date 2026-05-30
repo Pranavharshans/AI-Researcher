@@ -24,6 +24,7 @@ import type { CompileState } from "@/types/project";
 export const ProjectShell = () => {
   const [activeFileId, setActiveFileId] = useState(sampleFiles[0]?.id ?? "");
   const [compileState, setCompileState] = useState<CompileState>("idle");
+  const [agentStatus, setAgentStatus] = useState("AI status: waiting for diagram request");
 
   const activeFile = useMemo(
     () => sampleFiles.find((file) => file.id === activeFileId) ?? sampleFiles[0],
@@ -33,6 +34,10 @@ export const ProjectShell = () => {
   const runCompile = () => {
     setCompileState("running");
     window.setTimeout(() => setCompileState("success"), 900);
+  };
+
+  const startAddDiagram = () => {
+    setAgentStatus("AI status: Add diagram selected; prompt dialog is next");
   };
 
   return (
@@ -83,7 +88,7 @@ export const ProjectShell = () => {
           <FileTree files={sampleFiles} activeFileId={activeFile.id} onSelectFile={setActiveFileId} />
         </aside>
 
-        <EditorPane file={activeFile} />
+        <EditorPane file={activeFile} onAddDiagram={startAddDiagram} />
 
         <PreviewPane compileState={compileState} events={initialAgentEvents} />
       </section>
@@ -91,6 +96,7 @@ export const ProjectShell = () => {
       <StatusBar
         compileState={compileState}
         activeFilePath={activeFile.path}
+        agentStatus={agentStatus}
         leftIcon={<FileCode2 aria-hidden="true" />}
         rightIcon={compileState === "success" ? <CheckCircle2 aria-hidden="true" /> : <TerminalSquare aria-hidden="true" />}
         agentIcon={<Bot aria-hidden="true" />}

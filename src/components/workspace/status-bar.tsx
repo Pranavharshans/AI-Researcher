@@ -4,6 +4,7 @@ import type { CompileState } from "@/types/project";
 type StatusBarProps = {
   compileState: CompileState;
   activeFilePath: string;
+  agentStatus: string;
   leftIcon: ReactNode;
   rightIcon: ReactNode;
   agentIcon: ReactNode;
@@ -17,7 +18,7 @@ const stateLabel: Record<CompileState, string> = {
   error: "Compile failed"
 };
 
-export const StatusBar = ({ compileState, activeFilePath, leftIcon, rightIcon, agentIcon }: StatusBarProps) => {
+export const StatusBar = ({ compileState, activeFilePath, agentStatus, leftIcon, rightIcon, agentIcon }: StatusBarProps) => {
   return (
     <footer className="status-bar" aria-label="Compile and editor status">
       <div className="status-cluster">
@@ -27,7 +28,7 @@ export const StatusBar = ({ compileState, activeFilePath, leftIcon, rightIcon, a
       </div>
       <div className="status-cluster center" aria-live="polite">
         {agentIcon}
-        <span>AI status: waiting for diagram request</span>
+        <span>{agentStatus}</span>
       </div>
       <div className="status-cluster">
         {rightIcon}
