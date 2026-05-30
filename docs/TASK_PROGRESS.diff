@@ -71,9 +71,11 @@ new file mode 100644
 +    Result: Added server-side LaTeX log parser with structured error objects, file/line extraction, normalized error types, source context windows, TikZ missing-library hints, and unknown-node mismatch hints.
 +    Verification: `npm test`, `npm run typecheck`, `npm run lint`, and `npm run build` passed. Fixture tests cover basic LaTeX errors, missing TikZ positioning library, and unknown TikZ node detection.
 +
-+[ ] TASK-013 Implement agentic repair state machine
++[x] TASK-013 Implement agentic repair state machine
 +    Acceptance: observe -> parse -> diagnose -> plan -> patch -> verify loop.
 +    Important: max attempts are a safety budget only, not the repair algorithm.
++    Result: Added server-side repair state machine with explicit workflow phases, compile observation handling, evidence-carrying attempts, diagnosis and patch-plan records, recompile verification transitions, repeated-error escalation, failure explanation, acceptance, insertion, main compile, done, and user revision transitions.
++    Verification: `npm test`, `npm run typecheck`, `npm run lint`, and `npm run build` passed. State-machine fixture tests cover failed compile -> diagnosis -> patch planning -> patch application -> recompile -> preview, repeated-error escalation, and user revision branch.
 +
 +[ ] TASK-014 Implement structured patch applier
 +    Acceptance: applies model-proposed edits safely, supports rollback, restricts paths.
