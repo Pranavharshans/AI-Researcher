@@ -1,0 +1,82 @@
+diff --git a/product-plan/tasks b/product-plan/tasks
+new file mode 100644
+--- /dev/null
++++ b/product-plan/tasks
+@@
++# Agentic LaTeX Diagram Editor: Task Progress Tracker
++#
++# Status legend:
++# [x] completed
++# [~] in progress
++# [ ] not started
++# [!] blocked or needs decision
++#
++# This file tracks product and implementation progress in a diff-style ledger.
++
++[x] TASK-001 Install bencium marketplace skills
++    Result: Installed 14 bencium skills with `npx skills add bencium/bencium-marketplace -g --all`.
++    Installed location reported by CLI: ~/.agents/skills/*
++    Note: Restart Codex to auto-discover newly installed global skills.
++
++[x] TASK-002 Install UI UX Pro Max for Codex
++    Result: Installed `uipro-cli` globally with npm.
++    Result: Installed UI UX Pro Max project-local with `uipro init --ai codex`.
++    Installed location: .codex/skills/ui-ux-pro-max
++    Note: The current `uipro` version rejected the documented `--global` flag, so project-local install was used.
++
++[x] TASK-003 Apply requested skills to planning
++    Applied: bencium-controlled-ux-designer for production UX, accessibility, context menus, dialogs, and approval flow.
++    Applied: UI UX Pro Max for developer-tool design-system guidance, z-index/accessibility rules, and typography guidance.
++    Applied: human-architect-mindset from bencium for AI-aware decomposition and verifiable agent boundaries.
++
++[x] TASK-004 Create detailed PRD
++    Output: docs/PRD_AGENTIC_LATEX_DIAGRAM_EDITOR.md
++    Includes: UX, architecture, state machine, self-healing repair loop, model abstraction, OpenRouter role, APIs, data model, tests, risks.
++
++[x] TASK-005 Create progress tracker
++    Output: docs/TASK_PROGRESS.diff
++
++[x] TASK-006 Create test plan/results ledger
++    Output: docs/TEST_RESULTS.md
++
++[ ] TASK-007 Scaffold application shell
++    Target: Next.js + TypeScript app with Overleaf-like layout.
++    Acceptance: file tree, Monaco editor, preview panel, compile status bar.
++
++[ ] TASK-008 Implement editor right-click menu
++    Acceptance: context menu opens on editor right-click and includes "Add diagram".
++    Acceptance: keyboard accessible, Escape closes, no layout overlap.
++
++[ ] TASK-009 Implement Add Diagram dialog
++    Acceptance: prompt entry, style preset, generate/cancel buttons, validation.
++
++[ ] TASK-010 Implement model provider abstraction
++    Acceptance: internal ModelClient interface and OpenRouterProvider behind it.
++
++[ ] TASK-011 Implement LaTeX compiler sandbox
++    Acceptance: standalone figure compilation with timeout, no shell escape, artifact capture.
++
++[ ] TASK-012 Implement LaTeX log parser
++    Acceptance: extracts errors, file, line, normalized type, source context, and hints.
++
++[ ] TASK-013 Implement agentic repair state machine
++    Acceptance: observe -> parse -> diagnose -> plan -> patch -> verify loop.
++    Important: max attempts are a safety budget only, not the repair algorithm.
++
++[ ] TASK-014 Implement structured patch applier
++    Acceptance: applies model-proposed edits safely, supports rollback, restricts paths.
++
++[ ] TASK-015 Implement diagram preview and approval
++    Acceptance: preview ready state asks "Does this match what you wanted?"
++    Acceptance: Keep Diagram, Request Changes, Discard.
++
++[ ] TASK-016 Implement user revision loop
++    Acceptance: user feedback modifies existing diagram source and reruns compile/repair.
++
++[ ] TASK-017 Implement insertion into main document
++    Acceptance: approved diagram is inserted at target cursor/selection.
++    Acceptance: generated figure source is saved under figures/generated.
++
++[ ] TASK-018 Implement test suite
++    Acceptance: unit, integration, e2e, visual, and security tests from docs/TEST_RESULTS.md.
++
