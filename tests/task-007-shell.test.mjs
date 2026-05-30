@@ -6,6 +6,7 @@ const files = {
   shell: readFileSync("src/components/project-shell.tsx", "utf8"),
   editor: readFileSync("src/components/workspace/editor-pane.tsx", "utf8"),
   contextMenu: readFileSync("src/components/workspace/editor-context-menu.tsx", "utf8"),
+  addDiagramDialog: readFileSync("src/components/workspace/add-diagram-dialog.tsx", "utf8"),
   fileTree: readFileSync("src/components/workspace/file-tree.tsx", "utf8"),
   preview: readFileSync("src/components/workspace/preview-pane.tsx", "utf8"),
   status: readFileSync("src/components/workspace/status-bar.tsx", "utf8"),
@@ -19,6 +20,7 @@ assert.equal(packageData.dependencies["@monaco-editor/react"], "latest", "Monaco
 assert.match(files.shell, /<FileTree[\s\S]*<EditorPane[\s\S]*<PreviewPane/, "ProjectShell must include file tree, editor, and preview panes");
 assert.match(files.editor, /@monaco-editor\/react/, "Editor pane must load Monaco");
 assert.match(files.contextMenu, /role="menu"/, "Editor context menu must use menu semantics");
+assert.match(files.addDiagramDialog, /role="dialog"/, "Add Diagram must use dialog semantics");
 assert.match(files.preview, /aria-live="polite"/, "Preview status must be announced accessibly");
 assert.match(files.status, /aria-label="Compile and editor status"/, "Status bar must expose an accessible label");
 assert.match(files.css, /--z-context-menu:\s*30;/, "Shell must establish a bounded z-index scale");

@@ -14,6 +14,7 @@ import {
   Settings,
   TerminalSquare
 } from "lucide-react";
+import { AddDiagramDialog, type AddDiagramRequest } from "@/components/workspace/add-diagram-dialog";
 import { EditorPane } from "@/components/workspace/editor-pane";
 import { FileTree } from "@/components/workspace/file-tree";
 import { PreviewPane } from "@/components/workspace/preview-pane";
@@ -25,6 +26,7 @@ export const ProjectShell = () => {
   const [activeFileId, setActiveFileId] = useState(sampleFiles[0]?.id ?? "");
   const [compileState, setCompileState] = useState<CompileState>("idle");
   const [agentStatus, setAgentStatus] = useState("AI status: waiting for diagram request");
+  const [isAddDiagramOpen, setIsAddDiagramOpen] = useState(false);
 
   const activeFile = useMemo(
     () => sampleFiles.find((file) => file.id === activeFileId) ?? sampleFiles[0],
@@ -38,6 +40,12 @@ export const ProjectShell = () => {
 
   const startAddDiagram = () => {
     setAgentStatus("AI status: Add diagram selected; prompt dialog is next");
+    setIsAddDiagramOpen(true);
+  };
+
+  const submitDiagramRequest = (request: AddDiagramRequest) => {
+    setAgentStatus(`AI status: diagram request captured (${request.stylePreset}, ${request.outputTarget}); model provider pending`);
+    setIsAddDiagramOpen(false);
   };
 
   return (
@@ -100,6 +108,11 @@ export const ProjectShell = () => {
         leftIcon={<FileCode2 aria-hidden="true" />}
         rightIcon={compileState === "success" ? <CheckCircle2 aria-hidden="true" /> : <TerminalSquare aria-hidden="true" />}
         agentIcon={<Bot aria-hidden="true" />}
+      />
+      <AddDiagramDialog
+        isOpen={isAddDiagramOpen}
+        onClose={() => setIsAddDiagramOpen(false)}
+        onSubmit={submitDiagramRequest}
       />
     </main>
   );

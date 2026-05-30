@@ -7,7 +7,7 @@
     "dev": "next dev",
     "build": "next build",
     "lint": "eslint . --max-warnings=0",
-    "test": "node tests/task-007-shell.test.mjs && node tests/task-008-context-menu.test.mjs",
+    "test": "node tests/task-007-shell.test.mjs && node tests/task-008-context-menu.test.mjs && node tests/task-009-add-diagram-dialog.test.mjs",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

@@ -51,8 +51,10 @@ new file mode 100644
 +    Result: Added editor-scoped custom context menu with Add diagram, disabled future actions, Escape/outside close behavior, arrow-key navigation, and toolbar fallback for touch/keyboard users.
 +    Verification: `npm test`, `npm run typecheck`, `npm run lint`, `npm run build`, and Playwright right-click/toolbar smoke checks passed.
 +
-+[ ] TASK-009 Implement Add Diagram dialog
++[x] TASK-009 Implement Add Diagram dialog
 +    Acceptance: prompt entry, style preset, generate/cancel buttons, validation.
++    Result: Added accessible Add Diagram modal with required prompt textarea, 4,000 character guardrail, style preset selection, output target selection, Cancel, and Generate Diagram.
++    Verification: `npm test`, `npm run typecheck`, `npm run lint`, `npm run build`, and Playwright dialog validation/submission smoke checks passed.
 +
 +[ ] TASK-010 Implement model provider abstraction
 +    Acceptance: internal ModelClient interface and OpenRouterProvider behind it.
