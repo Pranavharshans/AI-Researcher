@@ -4,7 +4,7 @@
 
 This file is the running test ledger for the project. It defines the tests required for the Overleaf-like AI diagram feature and records execution results over time.
 
-Current status: TASK-016 user revision loop has been implemented. OpenRouter-dependent live calls are intentionally pending until an API key is provided.
+Current status: TASK-017 document insertion has been implemented. OpenRouter-dependent live calls are intentionally pending until an API key is provided.
 
 ## Test Environment
 
@@ -33,10 +33,29 @@ Future implementation environment:
 | PRD artifact creation | Passed | `docs/PRD_AGENTIC_LATEX_DIAGRAM_EDITOR.md` created. |
 | Progress tracker creation | Passed | `docs/TASK_PROGRESS.diff` created. |
 | Test ledger creation | Passed | `docs/TEST_RESULTS.md` created. |
-| Application unit tests | Passed | TASK-007 through TASK-016 tests validate shell, Monaco, context menu, dialog semantics, validation, model provider interface, OpenRouter adapter, compiler sandbox contract, LaTeX log parsing, repair state-machine transitions, structured patch application, rollback, path rejection, preview approval state, user revision loop, z-index scale, responsive CSS, and typography guardrails. |
+| Application unit tests | Passed | TASK-007 through TASK-017 tests validate shell, Monaco, context menu, dialog semantics, validation, model provider interface, OpenRouter adapter, compiler sandbox contract, LaTeX log parsing, repair state-machine transitions, structured patch application, rollback, path rejection, preview approval state, user revision loop, document insertion, z-index scale, responsive CSS, and typography guardrails. |
 | Compiler sandbox tests | Passed | TASK-011 structure tests validate standalone wrapper, per-job temp workspace, Docker network isolation args, no-shell-escape latexmk flags, timeout kill behavior, and artifact/log capture paths. |
 | Agent repair tests | Passed | TASK-013 and TASK-014 tests cover observation, diagnosis, patch planning, structured patch validation/application, rollback, recompilation handoff, preview readiness, repeated-error escalation, and user revision branching. |
-| E2E UI tests | Partial | Playwright smoke checked desktop/mobile shell rendering, TASK-008 right-click/toolbar context menu interaction, and TASK-009 dialog validation/submission. TASK-015 and TASK-016 have static UI guard coverage for preview approval and user revision; model-backed generation remains pending provider credentials. |
+| E2E UI tests | Partial | Playwright smoke checked desktop/mobile shell rendering, TASK-008 right-click/toolbar context menu interaction, and TASK-009 dialog validation/submission. TASK-015 through TASK-017 have static UI guard coverage for preview approval, user revision, and document insertion; model-backed generation remains pending provider credentials. |
+
+## Latest Execution: TASK-017 Document Insertion
+
+Date: 2026-05-31
+
+Commands:
+
+- `npm test` - Passed.
+- `npm run typecheck` - Passed.
+- `npm run lint` - Passed.
+- `npm run build` - Passed.
+
+Notes:
+
+- Keep Diagram now saves approved TikZ source under `figures/generated/diagram_001.tex`.
+- `main.tex` receives a figure environment with `\input{figures/generated/diagram_001}` at the existing diagram placeholder.
+- Existing generated figure files are updated rather than duplicated.
+- After insertion the active file switches to `main.tex`, the editor remounts with updated content, and main-document compile status runs.
+- OpenRouter calls remain skipped because no API key is provided.
 
 ## Latest Execution: TASK-016 User Revision Loop
 

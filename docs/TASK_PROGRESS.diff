@@ -93,9 +93,11 @@ new file mode 100644
 +    Result: Added Request Changes feedback form, revision validation, existing-source revision history, deterministic local source patching for keyless operation, recompile status, and return to preview approval after revision.
 +    Verification: `npm test`, `npm run typecheck`, `npm run lint`, and `npm run build` passed. Fixture tests cover feedback prompt, validation, revision submission, existing-source reuse, targeted source changes, revision history, recompile status, and responsive revision form styling.
 +
-+[ ] TASK-017 Implement insertion into main document
++[x] TASK-017 Implement insertion into main document
 +    Acceptance: approved diagram is inserted at target cursor/selection.
 +    Acceptance: generated figure source is saved under figures/generated.
++    Result: Added Keep Diagram insertion workflow with stateful project files, generated figure source save/update under `figures/generated/diagram_001.tex`, `main.tex` figure block insertion at the editor placeholder, active-file switch back to `main.tex`, and main-document compile status.
++    Verification: `npm test`, `npm run typecheck`, `npm run lint`, and `npm run build` passed. Fixture tests cover generated source path, saved source update, figure `\input`, stable label, placeholder-targeted insertion, main compile status, and editor refresh after content changes.
 +
 +[ ] TASK-018 Implement test suite
 +    Acceptance: unit, integration, e2e, visual, and security tests from docs/TEST_RESULTS.md.

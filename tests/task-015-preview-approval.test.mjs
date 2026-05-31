@@ -12,7 +12,7 @@ assert.match(projectTypes, /"ready" \| "kept" \| "changes-requested" \| "discard
 assert.match(shell, /setDiagramPreview\(createPreviewFromRequest\(request\)\)/, "Diagram submission must create a preview approval state");
 assert.match(shell, /data-preview-open=\{Boolean\(diagramPreview\)\}/, "Workspace must expose active preview state for responsive layout");
 assert.match(shell, /diagram compiled; waiting for approval/, "Submission must announce preview readiness");
-assert.match(shell, /onKeepDiagram=\{\(\) => updateDiagramApproval\("kept"\)\}/, "Shell must wire Keep Diagram");
+assert.match(shell, /onKeepDiagram=\{keepDiagram\}/, "Shell must wire Keep Diagram");
 assert.match(shell, /onRequestChanges=\{\(\) => updateDiagramApproval\("changes-requested"\)\}/, "Shell must wire Request Changes");
 assert.match(shell, /onDiscardDiagram=\{\(\) => updateDiagramApproval\("discarded"\)\}/, "Shell must wire Discard");
 assert.match(shell, /No OpenRouter call was made/, "Preview fixture must remain keyless and avoid provider calls");

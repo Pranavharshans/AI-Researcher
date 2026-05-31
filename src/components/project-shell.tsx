@@ -20,9 +20,10 @@ import { FileTree } from "@/components/workspace/file-tree";
 import { PreviewPane } from "@/components/workspace/preview-pane";
 import { StatusBar } from "@/components/workspace/status-bar";
 import { initialAgentEvents, sampleFiles } from "@/lib/sample-project";
-import type { CompileState, DiagramPreviewApproval, DiagramPreviewStatus } from "@/types/project";
+import type { CompileState, DiagramPreviewApproval, DiagramPreviewStatus, ProjectFile } from "@/types/project";
 
 export const ProjectShell = () => {
+  const [projectFiles, setProjectFiles] = useState<ProjectFile[]>(sampleFiles);
   const [activeFileId, setActiveFileId] = useState(sampleFiles[0]?.id ?? "");
   const [compileState, setCompileState] = useState<CompileState>("idle");
   const [agentStatus, setAgentStatus] = useState("AI status: waiting for diagram request");
@@ -30,8 +31,8 @@ export const ProjectShell = () => {
   const [diagramPreview, setDiagramPreview] = useState<DiagramPreviewApproval | null>(null);
 
   const activeFile = useMemo(
-    () => sampleFiles.find((file) => file.id === activeFileId) ?? sampleFiles[0],
-    [activeFileId]
+    () => projectFiles.find((file) => file.id === activeFileId) ?? projectFiles[0],
+    [activeFileId, projectFiles]
   );
 
   const runCompile = () => {
@@ -65,6 +66,24 @@ export const ProjectShell = () => {
     }
 
     setAgentStatus("AI status: diagram discarded; source was not inserted");
+  };
+
+  const keepDiagram = () => {
+    if (!diagramPreview) {
+      return;
+    }
+
+    const insertion = insertApprovedDiagram(projectFiles, diagramPreview);
+    setProjectFiles(insertion.files);
+    setActiveFileId("main");
+    setCompileState("running");
+    setDiagramPreview({ ...diagramPreview, status: "kept" });
+    setAgentStatus(`AI status: diagram inserted into ${insertion.mainFilePath}; compiling main document`);
+
+    window.setTimeout(() => {
+      setCompileState("success");
+      setAgentStatus(`AI status: diagram saved to ${diagramPreview.sourcePath} and inserted into ${insertion.mainFilePath}`);
+    }, 650);
   };
 
   const submitDiagramRevision = (feedback: string) => {
@@ -123,7 +142,7 @@ export const ProjectShell = () => {
             </div>
             <Folder aria-hidden="true" />
           </div>
-          <FileTree files={sampleFiles} activeFileId={activeFile.id} onSelectFile={setActiveFileId} />
+          <FileTree files={projectFiles} activeFileId={activeFile.id} onSelectFile={setActiveFileId} />
         </aside>
 
         <EditorPane file={activeFile} onAddDiagram={startAddDiagram} />
@@ -133,7 +152,7 @@ export const ProjectShell = () => {
           diagramPreview={diagramPreview}
           events={initialAgentEvents}
           onDiscardDiagram={() => updateDiagramApproval("discarded")}
-          onKeepDiagram={() => updateDiagramApproval("kept")}
+          onKeepDiagram={keepDiagram}
           onRequestChanges={() => updateDiagramApproval("changes-requested")}
           onSubmitRevision={submitDiagramRevision}
         />
@@ -141,7 +160,7 @@ export const ProjectShell = () => {
 
       <StatusBar
         compileState={compileState}
-        activeFilePath={activeFile.path}
+        activeFilePath={activeFile?.path ?? "main.tex"}
         agentStatus={agentStatus}
         leftIcon={<FileCode2 aria-hidden="true" />}
         rightIcon={compileState === "success" ? <CheckCircle2 aria-hidden="true" /> : <TerminalSquare aria-hidden="true" />}
@@ -160,7 +179,7 @@ const createPreviewFromRequest = (request: AddDiagramRequest): DiagramPreviewApp
   id: "diagram-preview-001",
   prompt: request.prompt,
   artifactPath: "artifacts/diagram_001.pdf",
-  sourcePath: request.outputTarget === "figure-file" ? "figures/generated/diagram_001.tex" : "main.tex",
+  sourcePath: generatedFigurePath,
   accessibleSummary:
     "Transformer diagram preview with input embeddings flowing through attention and feed-forward blocks toward labeled logits.",
   repairSummary: "Standalone compile succeeded after validating the generated TikZ source. No OpenRouter call was made in this keyless environment.",
@@ -181,6 +200,81 @@ const createPreviewFromRequest = (request: AddDiagramRequest): DiagramPreviewApp
 \end{tikzpicture}`,
   status: "ready"
 });
+
+type DiagramInsertionResult = {
+  files: ProjectFile[];
+  mainFilePath: string;
+};
+
+const generatedFigurePath = "figures/generated/diagram_001.tex";
+const diagramInsertionMarker = "% Right-click in the editor to add a generated diagram here.";
+
+const insertApprovedDiagram = (files: ProjectFile[], preview: DiagramPreviewApproval): DiagramInsertionResult => {
+  const savedFigureFiles = saveGeneratedFigureSource(files, preview.sourcePath, preview.source);
+  const filesWithMainInsertion = savedFigureFiles.map((file) => {
+    if (file.path !== "main.tex") {
+      return file;
+    }
+
+    return {
+      ...file,
+      content: insertDiagramInputIntoMain(file.content, preview)
+    };
+  });
+
+  return {
+    files: filesWithMainInsertion,
+    mainFilePath: "main.tex"
+  };
+};
+
+const saveGeneratedFigureSource = (files: ProjectFile[], sourcePath: string, source: string) => {
+  const normalizedSourcePath = sourcePath.startsWith("figures/generated/") ? sourcePath : generatedFigurePath;
+  const savedSource = `${source.trim()}\n`;
+  const hasFigureFile = files.some((file) => file.path === normalizedSourcePath);
+
+  if (hasFigureFile) {
+    return files.map((file) => (file.path === normalizedSourcePath ? { ...file, content: savedSource } : file));
+  }
+
+  return [
+    ...files,
+    {
+      id: "generated-diagram-001",
+      path: normalizedSourcePath,
+      language: "latex" as const,
+      content: savedSource
+    }
+  ];
+};
+
+const insertDiagramInputIntoMain = (mainSource: string, preview: DiagramPreviewApproval) => {
+  const figureBlock = createFigureInsertionBlock(preview);
+
+  if (mainSource.includes("\\label{fig:generated-diagram-001}")) {
+    return mainSource.replace(
+      /\\begin\{figure\}\[ht\][\s\S]*?\\label\{fig:generated-diagram-001\}\n\\end\{figure\}/,
+      figureBlock
+    );
+  }
+
+  if (mainSource.includes(diagramInsertionMarker)) {
+    return mainSource.replace(diagramInsertionMarker, `${diagramInsertionMarker}\n\n${figureBlock}`);
+  }
+
+  return mainSource.replace("\\end{document}", `${figureBlock}\n\n\\end{document}`);
+};
+
+const createFigureInsertionBlock = (preview: DiagramPreviewApproval) => {
+  const inputPath = (preview.sourcePath.startsWith("figures/generated/") ? preview.sourcePath : generatedFigurePath).replace(/\.tex$/, "");
+
+  return String.raw`\begin{figure}[ht]
+  \centering
+  \input{${inputPath}}
+  \caption{Generated diagram from the AI diagram workflow.}
+  \label{fig:generated-diagram-001}
+\end{figure}`;
+};
 
 const formatOutputTarget = (target: AddDiagramRequest["outputTarget"]) => {
   if (target === "figure-file") {

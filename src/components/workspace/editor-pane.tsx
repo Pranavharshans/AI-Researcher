@@ -64,7 +64,7 @@ export const EditorPane = ({ file, onAddDiagram }: EditorPaneProps) => {
         onContextMenuCapture={openContextMenu}
       >
         <MonacoEditor
-          key={file.id}
+          key={`${file.id}:${file.content.length}`}
           defaultLanguage={file.language === "bibtex" ? "bibtex" : "latex"}
           defaultValue={file.content}
           theme="vs-dark"
