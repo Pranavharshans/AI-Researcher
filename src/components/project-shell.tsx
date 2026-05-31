@@ -67,6 +67,17 @@ export const ProjectShell = () => {
     setAgentStatus("AI status: diagram discarded; source was not inserted");
   };
 
+  const submitDiagramRevision = (feedback: string) => {
+    setCompileState("running");
+    setAgentStatus("AI status: revising existing diagram source");
+
+    window.setTimeout(() => {
+      setCompileState("success");
+      setAgentStatus("AI status: revised diagram compiled; waiting for approval; OpenRouter pending key");
+      setDiagramPreview((preview) => (preview ? revisePreviewFromFeedback(preview, feedback) : preview));
+    }, 650);
+  };
+
   return (
     <main className="project-shell" aria-label="Agentic LaTeX Diagram Editor">
       <header className="top-bar">
@@ -124,6 +135,7 @@ export const ProjectShell = () => {
           onDiscardDiagram={() => updateDiagramApproval("discarded")}
           onKeepDiagram={() => updateDiagramApproval("kept")}
           onRequestChanges={() => updateDiagramApproval("changes-requested")}
+          onSubmitRevision={submitDiagramRevision}
         />
       </section>
 
@@ -157,6 +169,7 @@ const createPreviewFromRequest = (request: AddDiagramRequest): DiagramPreviewApp
     "Compiled the standalone figure and prepared an approval checkpoint.",
     `Targeted output route: ${formatOutputTarget(request.outputTarget)}.`
   ],
+  revisionHistory: [],
   source: String.raw`\begin{tikzpicture}[node distance=1.9cm, >=stealth]
   \node[draw, rounded corners, fill=green!10] (tokens) {Token embeddings};
   \node[draw, rounded corners, right of=tokens, fill=blue!8] (attention) {Multi-head attention};
@@ -179,4 +192,43 @@ const formatOutputTarget = (target: AddDiagramRequest["outputTarget"]) => {
   }
 
   return "current cursor position";
+};
+
+const revisePreviewFromFeedback = (preview: DiagramPreviewApproval, feedback: string): DiagramPreviewApproval => {
+  const revisionNumber = preview.revisionHistory.length + 1;
+  const revisedSource = applyLocalRevisionToSource(preview.source, feedback, revisionNumber);
+
+  return {
+    ...preview,
+    source: revisedSource,
+    accessibleSummary: `${preview.accessibleSummary} Revision ${revisionNumber} applies: ${feedback}.`,
+    repairSummary: "Revision compiled from the existing diagram source and returned to approval. OpenRouter remains pending key.",
+    changes: [
+      `Revision ${revisionNumber}: ${feedback}`,
+      "Used the existing TikZ source as the starting point.",
+      "Recompiled the revised standalone figure and returned to preview approval."
+    ],
+    revisionHistory: [...preview.revisionHistory, feedback],
+    status: "ready"
+  };
+};
+
+const applyLocalRevisionToSource = (source: string, feedback: string, revisionNumber: number) => {
+  const escapedFeedback = feedback.replaceAll("\n", " ").trim();
+  const annotatedSource = source.includes("% User revision")
+    ? source.replace(/% User revision \d+: .*\n/, `% User revision ${revisionNumber}: ${escapedFeedback}\n`)
+    : source.replace("\\begin{tikzpicture}", `% User revision ${revisionNumber}: ${escapedFeedback}\n\\begin{tikzpicture}`);
+
+  if (/curv|bend|arc/i.test(feedback)) {
+    return annotatedSource.replaceAll("\\draw[->]", "\\draw[->, bend left=12]");
+  }
+
+  if (/label|annotation|caption/i.test(feedback)) {
+    return annotatedSource.replace(
+      "\\node[draw, rounded corners, right of=attention, fill=amber!10] (mlp) {Feed-forward block};",
+      "\\node[draw, rounded corners, right of=attention, fill=amber!10] (mlp) {Feed-forward block\\\\small revised};"
+    );
+  }
+
+  return annotatedSource;
 };

@@ -1,3 +1,6 @@
+"use client";
+
+import { useId, useState, type FormEvent } from "react";
 import { Activity, Bot, CheckCircle2, Clock3, FileText, RotateCcw, SquareCode, Trash2, TriangleAlert } from "lucide-react";
 import type { AgentEvent, CompileState, DiagramPreviewApproval } from "@/types/project";
 
@@ -8,7 +11,10 @@ type PreviewPaneProps = {
   onDiscardDiagram: () => void;
   onKeepDiagram: () => void;
   onRequestChanges: () => void;
+  onSubmitRevision: (feedback: string) => void;
 };
+
+const revisionFeedbackMaxLength = 1200;
 
 const compileCopy: Record<CompileState, { label: string; detail: string }> = {
   idle: {
@@ -74,10 +80,42 @@ export const PreviewPane = ({
   events,
   onDiscardDiagram,
   onKeepDiagram,
-  onRequestChanges
+  onRequestChanges,
+  onSubmitRevision
 }: PreviewPaneProps) => {
   const copy = compileCopy[compileState];
   const previewCopy = diagramPreview ? approvalCopy[diagramPreview.status] : null;
+  const revisionFeedbackId = useId();
+  const revisionErrorId = useId();
+  const [revisionFeedback, setRevisionFeedback] = useState("");
+  const [revisionError, setRevisionError] = useState("");
+  const hasRevisionOverflow = revisionFeedback.length > revisionFeedbackMaxLength;
+
+  const openRevisionForm = () => {
+    setRevisionFeedback("");
+    setRevisionError("");
+    onRequestChanges();
+  };
+
+  const submitRevision = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const trimmedFeedback = revisionFeedback.trim();
+
+    if (!trimmedFeedback) {
+      setRevisionError("Describe what should change before revising the diagram.");
+      return;
+    }
+
+    if (hasRevisionOverflow) {
+      setRevisionError("Keep revision feedback under 1,200 characters.");
+      return;
+    }
+
+    setRevisionFeedback("");
+    setRevisionError("");
+    onSubmitRevision(trimmedFeedback);
+  };
 
   return (
     <aside className="preview-pane" aria-label="PDF and diagram preview">
@@ -87,7 +125,7 @@ export const PreviewPane = ({
           <h2>main.pdf</h2>
         </div>
         <span className="status-pill" data-state={diagramPreview?.status ?? compileState} aria-live="polite">
-          {copy.label}
+          {previewCopy?.label ?? copy.label}
         </span>
       </div>
 
@@ -114,7 +152,7 @@ export const PreviewPane = ({
           <Bot aria-hidden="true" />
           <div>
             <p>AI diagram workflow</p>
-            <h3>{copy.detail}</h3>
+            <h3>{previewCopy?.detail ?? copy.detail}</h3>
           </div>
         </div>
         <ol className="event-list">
@@ -165,7 +203,7 @@ export const PreviewPane = ({
                 <button
                   className="secondary-button"
                   disabled={diagramPreview.status !== "ready"}
-                  onClick={onRequestChanges}
+                  onClick={openRevisionForm}
                   type="button"
                 >
                   <RotateCcw aria-hidden="true" />
@@ -182,6 +220,39 @@ export const PreviewPane = ({
                 </button>
               </div>
             </div>
+            {diagramPreview.status === "changes-requested" ? (
+              <form className="diagram-revision-form" onSubmit={submitRevision}>
+                <label htmlFor={revisionFeedbackId}>What should change?</label>
+                <textarea
+                  aria-describedby={revisionError ? revisionErrorId : undefined}
+                  aria-invalid={Boolean(revisionError)}
+                  id={revisionFeedbackId}
+                  maxLength={revisionFeedbackMaxLength + 120}
+                  onChange={(event) => {
+                    setRevisionFeedback(event.target.value);
+                    if (revisionError) {
+                      setRevisionError("");
+                    }
+                  }}
+                  placeholder="Example: Make the arrows curved and label the middle block as Layer update."
+                  value={revisionFeedback}
+                />
+                <div className="field-meta">
+                  <span id={revisionErrorId} aria-live="polite" className="field-error">
+                    {revisionError}
+                  </span>
+                  <span className={hasRevisionOverflow ? "character-count danger" : "character-count"}>
+                    {revisionFeedback.length}/{revisionFeedbackMaxLength}
+                  </span>
+                </div>
+                <div className="diagram-revision-actions">
+                  <button className="primary-button" disabled={compileState === "running"} type="submit">
+                    <RotateCcw aria-hidden="true" />
+                    Revise Diagram
+                  </button>
+                </div>
+              </form>
+            ) : null}
           </section>
         ) : null}
       </section>

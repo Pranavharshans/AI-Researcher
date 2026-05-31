@@ -25,5 +25,6 @@ export type DiagramPreviewApproval = {
   accessibleSummary: string;
   repairSummary: string;
   changes: string[];
+  revisionHistory: string[];
   status: DiagramPreviewStatus;
 };

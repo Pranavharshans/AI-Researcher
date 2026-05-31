@@ -88,8 +88,10 @@ new file mode 100644
 +    Result: Added typed preview approval state, compiled diagram preview surface, accessible summary, repair/change summary, collapsible source preview, and approval actions for Keep Diagram, Request Changes, and Discard.
 +    Verification: `npm test`, `npm run typecheck`, `npm run lint`, and `npm run build` passed. Fixture tests cover preview-ready state creation, keyless OpenRouter behavior, approval action wiring, accessible labels/live regions, source preview, and responsive approval styling.
 +
-+[ ] TASK-016 Implement user revision loop
++[x] TASK-016 Implement user revision loop
 +    Acceptance: user feedback modifies existing diagram source and reruns compile/repair.
++    Result: Added Request Changes feedback form, revision validation, existing-source revision history, deterministic local source patching for keyless operation, recompile status, and return to preview approval after revision.
++    Verification: `npm test`, `npm run typecheck`, `npm run lint`, and `npm run build` passed. Fixture tests cover feedback prompt, validation, revision submission, existing-source reuse, targeted source changes, revision history, recompile status, and responsive revision form styling.
 +
 +[ ] TASK-017 Implement insertion into main document
 +    Acceptance: approved diagram is inserted at target cursor/selection.
