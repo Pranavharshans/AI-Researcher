@@ -7,7 +7,7 @@
     "dev": "next dev",
     "build": "next build",
     "lint": "eslint . --max-warnings=0",
-    "test": "node tests/task-007-shell.test.mjs && node tests/task-008-context-menu.test.mjs && node tests/task-009-add-diagram-dialog.test.mjs && node tests/task-010-model-provider.test.mjs && node tests/task-011-compiler-sandbox.test.mjs && node tests/task-012-log-parser.test.mjs && node tests/task-013-repair-state-machine.test.mjs && node tests/task-014-patch-applier.test.mjs && node tests/task-015-preview-approval.test.mjs && node tests/task-016-user-revision-loop.test.mjs && node tests/task-017-document-insertion.test.mjs",
+    "test": "node tests/task-007-shell.test.mjs && node tests/task-008-context-menu.test.mjs && node tests/task-009-add-diagram-dialog.test.mjs && node tests/task-010-model-provider.test.mjs && node tests/task-011-compiler-sandbox.test.mjs && node tests/task-012-log-parser.test.mjs && node tests/task-013-repair-state-machine.test.mjs && node tests/task-014-patch-applier.test.mjs && node tests/task-015-preview-approval.test.mjs && node tests/task-016-user-revision-loop.test.mjs && node tests/task-017-document-insertion.test.mjs && node tests/task-018-test-suite-coverage.test.mjs",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
