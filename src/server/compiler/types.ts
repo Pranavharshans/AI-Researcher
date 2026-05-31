@@ -6,6 +6,7 @@ export type LatexNormalizedErrorType =
   | "latex_error"
   | "missing_tikz_library"
   | "unknown_tikz_node"
+  | "undefined_xcolor_color"
   | "undefined_control_sequence"
   | "missing_package"
   | "timeout"

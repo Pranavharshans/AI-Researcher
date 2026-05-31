@@ -19,6 +19,8 @@ export type DiagramPreviewStatus = "ready" | "kept" | "changes-requested" | "dis
 export type DiagramPreviewApproval = {
   id: string;
   prompt: string;
+  outputTarget: "inline" | "figure-file" | "replace-placeholder";
+  insertionOffset: number | null;
   artifactPath: string;
   sourcePath: string;
   source: string;

@@ -49,6 +49,7 @@ const requiredUnitCoverage = [
   [tests.task012, /Parser should return one basic LaTeX error/, "UT-001 basic LaTeX error parsing"],
   [tests.task012, /missing_tikz_library/, "UT-002 missing TikZ library detection"],
   [tests.task012, /unknown_tikz_node/, "UT-003 unknown node detection"],
+  [tests.task012, /undefined_xcolor_color/, "UT-003b undefined xcolor color detection"],
   [tests.task014, /Patch applier should record applied edit/, "UT-004 structured patch validation"],
   [tests.task014, /path_outside_workspace/, "UT-005 path traversal rejection"],
   [tests.task013, /NEEDS_ESCALATION/, "UT-006 repeated error escalation"],
@@ -57,13 +58,14 @@ const requiredUnitCoverage = [
 ];
 
 const requiredIntegrationCoverage = [
-  [sources.projectShell, /setDiagramPreview\(createPreviewFromRequest\(request\)\)/, "IT-001 simple diagram reaches preview"],
+  [sources.projectShell, /const preview = createPreviewFromRequest\([\s\S]*request,[\s\S]*generated,[\s\S]*setDiagramPreview\(preview\)/, "IT-001 simple diagram reaches preview"],
   [tests.task012, /usetikzlibrary.*positioning/, "IT-002 missing library repair evidence"],
   [tests.task014, /\(encoder\.east\)[\s\S]*\(enc\.east\)/, "IT-003 unknown node repair patch"],
   [sources.logParser, /return "latex_error"/, "malformed brace failures fall back to generic LaTeX error handling"],
   [tests.task014, /operation: "replace"/, "malformed source can be repaired by structured replace patch"],
   [tests.task016, /Used the existing TikZ source as the starting point/, "IT-004 user revision reuses current source"],
-  [tests.task017, /inputPath/, "IT-005 accepted diagram inserts into main.tex"]
+  [tests.task017, /inputPath/, "IT-005 accepted diagram inserts into main.tex"],
+  [tests.task017, /repairGeneratedLatexColorAliases/, "IT-006 generated color aliases are auto-repaired after compile failure"]
 ];
 
 const requiredE2ECoverage = [
@@ -84,7 +86,7 @@ const requiredVisualCoverage = [
   [sources.contextMenu, /window\.innerWidth - menuWidth - viewportPadding/, "context menu right-edge guard"],
   [sources.contextMenu, /window\.innerHeight - menuHeight - viewportPadding/, "context menu bottom-edge guard"],
   [sources.css, /text-overflow: ellipsis/, "long labels truncate cleanly"],
-  [sources.css, /white-space: pre-wrap/, "long source/status text wraps where needed"],
+  [sources.projectShell, /stageGeneratedDiagramSource\(preview\)/, "generated source is staged into a source file"],
   [tests.task015, /Responsive layout must keep approval visible/, "preview approval responsive guard"]
 ];
 

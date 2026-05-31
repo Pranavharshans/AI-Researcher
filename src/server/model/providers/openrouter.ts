@@ -56,11 +56,7 @@ export const createOpenRouterRequestBody = (request: ModelRequest, defaultProvid
   const model = request.model ?? defaultProviderModel;
   const systemMessage: OpenRouterMessage = {
     role: "system",
-    content: [
-      "You are the model layer for an agentic LaTeX diagram editor.",
-      "Return only outputs matching the requested schema.",
-      `Task: ${request.task}. ${modelTaskDescriptions[request.task]}`
-    ].join(" ")
+    content: createSystemPrompt(request)
   };
 
   const body: OpenRouterRequestBody = {
@@ -94,6 +90,27 @@ export const createOpenRouterRequestBody = (request: ModelRequest, defaultProvid
   return body;
 };
 
+const createSystemPrompt = (request: ModelRequest) => {
+  const taskDescription = `Task: ${request.task}. ${modelTaskDescriptions[request.task]}`;
+
+  if (request.task === "generate_diagram_source") {
+    return [
+      "You generate LaTeX diagrams for an editor.",
+      "Return only raw LaTeX/TikZ source.",
+      "Do not return markdown fences, JSON, explanations, captions, prose, comments, or surrounding text.",
+      "The first non-whitespace characters must be \\begin{tikzpicture}.",
+      "The final non-whitespace characters must be \\end{tikzpicture}.",
+      taskDescription
+    ].join(" ");
+  }
+
+  return [
+    "You are the model layer for an agentic LaTeX diagram editor.",
+    request.responseSchema ? "Return only outputs matching the requested schema." : "Return only the requested content.",
+    taskDescription
+  ].join(" ");
+};
+
 export class OpenRouterProvider implements ModelClient {
   readonly provider = "openrouter";
   private readonly apiKey?: string;
@@ -124,7 +141,13 @@ export class OpenRouterProvider implements ModelClient {
     });
 
     if (!response.ok) {
-      throw new ModelProviderError(`OpenRouter request failed with status ${response.status}.`, "request_failed", response.status);
+      const detail = await readOpenRouterErrorDetail(response);
+      const message =
+        response.status === 429
+          ? "OpenRouter rate limit hit for the configured model/key."
+          : `OpenRouter request failed with status ${response.status}.`;
+
+      throw new ModelProviderError(message, "request_failed", response.status, detail);
     }
 
     const data = (await response.json()) as OpenRouterResponseBody;
@@ -165,3 +188,19 @@ export class OpenRouterProvider implements ModelClient {
     return headers;
   }
 }
+
+const readOpenRouterErrorDetail = async (response: Response) => {
+  const text = await response.text().catch(() => "");
+
+  if (!text) {
+    return response.statusText;
+  }
+
+  try {
+    const parsed = JSON.parse(text) as { error?: { message?: string }; message?: string };
+
+    return parsed.error?.message ?? parsed.message ?? text;
+  } catch {
+    return text;
+  }
+};

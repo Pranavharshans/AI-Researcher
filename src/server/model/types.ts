@@ -65,12 +65,14 @@ export type ModelClient = {
 
 export class ModelProviderError extends Error {
   readonly code: "missing_api_key" | "request_failed" | "invalid_response";
+  readonly detail?: string;
   readonly status?: number;
 
-  constructor(message: string, code: ModelProviderError["code"], status?: number) {
+  constructor(message: string, code: ModelProviderError["code"], status?: number, detail?: string) {
     super(message);
     this.name = "ModelProviderError";
     this.code = code;
+    this.detail = detail;
     this.status = status;
   }
 }

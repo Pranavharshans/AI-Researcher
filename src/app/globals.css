@@ -107,8 +107,7 @@ button:focus-visible,
 
 .project-kicker,
 .pane-toolbar p,
-.panel-heading p,
-.agent-rail-heading p {
+.panel-heading p {
   margin: 0;
   color: var(--subtle);
   font-size: 11px;
@@ -164,7 +163,6 @@ button:focus-visible,
 .panel-heading svg,
 .file-tree svg,
 .status-bar svg,
-.agent-rail svg,
 .compiled-diagram-preview svg,
 .figure-placeholder svg {
   width: 18px;
@@ -589,57 +587,58 @@ kbd {
   background-size: 28px 28px;
 }
 
-.paper-page {
-  width: min(100%, 520px);
-  min-height: 620px;
-  margin: 0 auto;
-  padding: 44px 42px;
-  border: 1px solid #d7dde7;
-  border-radius: 3px;
-  background: #f8fafc;
-  color: #172033;
-  box-shadow: var(--shadow);
-}
-
-.paper-header {
-  width: 68px;
-  height: 8px;
-  margin-bottom: 28px;
-  background: #172033;
-}
-
-.paper-page h3 {
-  margin: 0;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 25px;
-  line-height: 1.12;
-  letter-spacing: 0;
-}
-
-.paper-rule {
-  height: 1px;
-  margin: 22px 0;
-  background: #cbd5e1;
-}
-
-.paper-page p {
-  margin: 0 0 24px;
-  color: #334155;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 14px;
-  line-height: 1.7;
-}
-
 .figure-placeholder {
   display: grid;
   place-items: center;
   gap: 8px;
-  min-height: 160px;
+  min-height: 360px;
   border: 1px dashed #64748b;
   background: #e8edf4;
   color: #334155;
   font-size: 13px;
   text-align: center;
+}
+
+.pdf-frame {
+  display: block;
+  width: min(100%, 760px);
+  height: min(82vh, 900px);
+  min-height: 620px;
+  margin: 0 auto;
+  border: 1px solid #d7dde7;
+  border-radius: 3px;
+  background: #f8fafc;
+  box-shadow: var(--shadow);
+}
+
+.compile-error-panel {
+  display: grid;
+  gap: 12px;
+  width: min(100%, 760px);
+  min-height: 420px;
+  margin: 0 auto;
+  padding: 18px;
+  border: 1px solid rgba(239, 68, 68, 0.5);
+  border-radius: 6px;
+  background: #180f16;
+  color: #fee2e2;
+}
+
+.compile-error-panel strong {
+  color: #fecaca;
+  font-size: 14px;
+}
+
+.compile-error-panel pre {
+  min-height: 0;
+  max-height: 70vh;
+  margin: 0;
+  overflow: auto;
+  color: #f8fafc;
+  font-family: "Fira Code", monospace;
+  font-size: 12px;
+  line-height: 1.55;
+  white-space: pre-wrap;
 }
 
 .compiled-diagram-preview {
@@ -652,41 +651,16 @@ kbd {
   color: #172033;
 }
 
-.compiled-diagram-preview figcaption {
-  display: grid;
-  gap: 4px;
-}
-
-.compiled-diagram-preview figcaption span {
-  color: #64748b;
-  font-family: "Fira Code", monospace;
-  font-size: 10px;
-}
-
-.compiled-diagram-preview figcaption strong {
-  color: #172033;
-  font-family: "Fira Sans", ui-sans-serif, system-ui, sans-serif;
-  font-size: 13px;
-  line-height: 1.35;
-}
-
-.compiled-diagram-preview p {
-  margin: 0;
-  color: #475569;
-  font-family: "Fira Sans", ui-sans-serif, system-ui, sans-serif;
-  font-size: 12px;
-  line-height: 1.45;
-}
-
 .diagram-flow {
-  display: grid;
-  grid-template-columns: minmax(70px, 1fr) 20px minmax(70px, 1fr) 20px minmax(70px, 1fr) 20px minmax(70px, 1fr);
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
 }
 
 .diagram-node {
   display: grid;
+  flex: 1 1 86px;
   min-height: 56px;
   place-items: center;
   padding: 8px;
@@ -734,97 +708,16 @@ kbd {
   content: "";
 }
 
-.paper-lines {
+.diagram-approval {
   display: grid;
-  gap: 10px;
-  margin-top: 26px;
-}
-
-.paper-lines span {
-  display: block;
-  height: 7px;
-  background: #dbe3ee;
-}
-
-.paper-lines span:nth-child(2) {
-  width: 86%;
-}
-
-.paper-lines span:nth-child(3) {
-  width: 64%;
-}
-
-.agent-rail {
+  gap: 12px;
+  padding: 14px;
   border-top: 1px solid var(--border);
   background: rgba(15, 23, 42, 0.78);
 }
 
-.agent-rail-heading {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 14px;
-}
-
-.agent-rail-heading h3 {
-  margin: 2px 0 0;
-  color: var(--muted);
-  font-size: 13px;
-  line-height: 1.4;
-}
-
-.event-list {
-  display: grid;
-  gap: 8px;
-  margin: 0;
-  padding: 0 14px 14px;
-  list-style: none;
-}
-
-.event-item {
-  display: grid;
-  grid-template-columns: 18px minmax(0, 1fr);
-  gap: 10px;
-  padding: 10px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background: rgba(24, 34, 54, 0.72);
-}
-
-.event-item[data-state="complete"] svg {
-  color: var(--accent);
-}
-
-.event-item[data-state="current"] svg {
-  color: #fbbf24;
-}
-
-.event-item strong,
-.event-item span {
-  display: block;
-}
-
-.event-item strong {
-  color: var(--text);
-  font-size: 13px;
-}
-
-.event-item span {
-  margin-top: 3px;
-  color: var(--muted);
-  font-size: 12px;
-  line-height: 1.4;
-}
-
-.diagram-approval {
-  display: grid;
-  gap: 12px;
-  padding: 0 14px 14px;
-}
-
 .diagram-approval-header,
-.diagram-change-summary,
-.diagram-source-preview,
+.diagram-approval-preview,
 .diagram-approval-question {
   border: 1px solid var(--border);
   border-radius: 6px;
@@ -837,8 +730,7 @@ kbd {
   padding: 12px;
 }
 
-.diagram-approval-header p,
-.diagram-change-summary p {
+.diagram-approval-header p {
   margin: 0;
   color: var(--muted);
   font-size: 12px;
@@ -865,60 +757,16 @@ kbd {
   color: #fca5a5;
 }
 
-.diagram-change-summary {
+.diagram-approval-preview {
+  display: grid;
+  gap: 10px;
   padding: 12px;
 }
 
-.diagram-change-summary strong,
+.diagram-approval-preview > strong,
 .diagram-approval-question strong {
   color: var(--text);
   font-size: 13px;
-}
-
-.diagram-change-summary ul {
-  display: grid;
-  gap: 6px;
-  margin: 10px 0 0;
-  padding-left: 18px;
-  color: var(--muted);
-  font-size: 12px;
-  line-height: 1.4;
-}
-
-.diagram-source-preview {
-  overflow: hidden;
-}
-
-.diagram-source-preview summary {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 38px;
-  padding: 0 12px;
-  color: var(--text);
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 800;
-}
-
-.diagram-source-preview summary svg {
-  width: 16px;
-  height: 16px;
-  color: #86efac;
-}
-
-.diagram-source-preview pre {
-  max-height: 180px;
-  margin: 0;
-  overflow: auto;
-  padding: 12px;
-  border-top: 1px solid var(--border);
-  background: #0b1020;
-  color: #dbeafe;
-  font-family: "Fira Code", monospace;
-  font-size: 11px;
-  line-height: 1.5;
-  white-space: pre-wrap;
 }
 
 .diagram-approval-question {

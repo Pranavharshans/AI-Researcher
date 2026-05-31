@@ -17,18 +17,69 @@ const MonacoEditor = dynamic(() => import("@monaco-editor/react"), {
 type EditorPaneProps = {
   file: ProjectFile;
   onAddDiagram: () => void;
+  onChangeFileContent: (fileId: string, content: string) => void;
+  onCursorChange: (fileId: string, offset: number) => void;
 };
 
-export const EditorPane = ({ file, onAddDiagram }: EditorPaneProps) => {
+type EditorCursorPosition = {
+  column: number;
+  lineNumber: number;
+};
+
+type MonacoEditorInstance = {
+  focus: () => void;
+  getModel: () => {
+    getOffsetAt: (position: EditorCursorPosition) => number;
+  } | null;
+  getPosition: () => EditorCursorPosition | null;
+  getTargetAtClientPoint?: (clientX: number, clientY: number) => { position?: EditorCursorPosition | null } | null;
+  onDidChangeCursorPosition: (listener: (event: { position: EditorCursorPosition }) => void) => { dispose: () => void };
+  setPosition: (position: EditorCursorPosition) => void;
+};
+
+export const EditorPane = ({ file, onAddDiagram, onChangeFileContent, onCursorChange }: EditorPaneProps) => {
   const contextMenuRef = useRef<HTMLDivElement>(null);
+  const editorRef = useRef<MonacoEditorInstance | null>(null);
+  const cursorListenerRef = useRef<{ dispose: () => void } | null>(null);
   const [menuPosition, setMenuPosition] = useState<EditorContextMenuPosition>({ x: 0, y: 0 });
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  const reportCursorOffset = useCallback(
+    (position: EditorCursorPosition | null) => {
+      const model = editorRef.current?.getModel();
+
+      if (!model || !position) {
+        return;
+      }
+
+      onCursorChange(file.id, model.getOffsetAt(position));
+    },
+    [file.id, onCursorChange]
+  );
+
+  const handleEditorMount = useCallback(
+    (editor: MonacoEditorInstance) => {
+      cursorListenerRef.current?.dispose();
+      editorRef.current = editor;
+      reportCursorOffset(editor.getPosition());
+      cursorListenerRef.current = editor.onDidChangeCursorPosition((event) => reportCursorOffset(event.position));
+    },
+    [reportCursorOffset]
+  );
+
   const openContextMenu = useCallback((event: MouseEvent<HTMLDivElement>) => {
     event.preventDefault();
+    const targetPosition = editorRef.current?.getTargetAtClientPoint?.(event.clientX, event.clientY)?.position ?? null;
+
+    if (targetPosition) {
+      editorRef.current?.setPosition(targetPosition);
+      editorRef.current?.focus();
+      reportCursorOffset(targetPosition);
+    }
+
     setMenuPosition({ x: event.clientX, y: event.clientY });
     setIsMenuOpen(true);
-  }, []);
+  }, [reportCursorOffset]);
 
   const openToolbarMenu = useCallback((event: MouseEvent<HTMLButtonElement>) => {
     const button = event.currentTarget.getBoundingClientRect();
@@ -64,10 +115,12 @@ export const EditorPane = ({ file, onAddDiagram }: EditorPaneProps) => {
         onContextMenuCapture={openContextMenu}
       >
         <MonacoEditor
-          key={`${file.id}:${file.content.length}`}
+          key={file.id}
           defaultLanguage={file.language === "bibtex" ? "bibtex" : "latex"}
-          defaultValue={file.content}
+          onMount={handleEditorMount}
+          onChange={(value) => onChangeFileContent(file.id, value ?? "")}
           theme="vs-dark"
+          value={file.content}
           options={{
             fontFamily: "'Fira Code', 'SFMono-Regular', Consolas, monospace",
             fontLigatures: false,

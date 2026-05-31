@@ -1,17 +1,28 @@
 "use client";
 
-import { useId, useState, type FormEvent } from "react";
-import { Activity, Bot, CheckCircle2, Clock3, FileText, RotateCcw, SquareCode, Trash2, TriangleAlert } from "lucide-react";
-import type { AgentEvent, CompileState, DiagramPreviewApproval } from "@/types/project";
+import { Fragment, useId, useState, type FormEvent } from "react";
+import { CheckCircle2, FileText, RotateCcw, Trash2 } from "lucide-react";
+import type { CompileState, DiagramPreviewApproval } from "@/types/project";
 
 type PreviewPaneProps = {
   compileState: CompileState;
+  compiledDocument: LatexCompilePreview | null;
   diagramPreview: DiagramPreviewApproval | null;
-  events: AgentEvent[];
   onDiscardDiagram: () => void;
   onKeepDiagram: () => void;
   onRequestChanges: () => void;
   onSubmitRevision: (feedback: string) => void;
+};
+
+type LatexCompilePreview = {
+  compileLog: string;
+  errorSummary?: string;
+  exitCode: number | null;
+  pdfDataUrl: string | null;
+  stderr: string;
+  stdout: string;
+  succeeded: boolean;
+  timedOut: boolean;
 };
 
 const revisionFeedbackMaxLength = 1200;
@@ -39,22 +50,6 @@ const compileCopy: Record<CompileState, { label: string; detail: string }> = {
   }
 };
 
-const getEventIcon = (state: AgentEvent["state"]) => {
-  if (state === "complete") {
-    return <CheckCircle2 aria-hidden="true" />;
-  }
-
-  if (state === "warning") {
-    return <TriangleAlert aria-hidden="true" />;
-  }
-
-  if (state === "current") {
-    return <Activity aria-hidden="true" />;
-  }
-
-  return <Clock3 aria-hidden="true" />;
-};
-
 const approvalCopy: Record<DiagramPreviewApproval["status"], { label: string; detail: string }> = {
   ready: {
     label: "Approval needed",
@@ -76,8 +71,8 @@ const approvalCopy: Record<DiagramPreviewApproval["status"], { label: string; de
 
 export const PreviewPane = ({
   compileState,
+  compiledDocument,
   diagramPreview,
-  events,
   onDiscardDiagram,
   onKeepDiagram,
   onRequestChanges,
@@ -129,159 +124,165 @@ export const PreviewPane = ({
         </span>
       </div>
 
-      <div className="pdf-preview" aria-label="Rendered PDF preview placeholder">
-        <div className="paper-page">
-          <div className="paper-header" />
-          <h3>Learning Interpretable Transformers</h3>
-          <div className="paper-rule" />
-          <p>
-            We model the agentic diagram workflow as a verified compiler loop with evidence-driven
-            repair steps.
-          </p>
-          {diagramPreview ? <DiagramFigurePreview preview={diagramPreview} /> : <EmptyFigurePreview />}
-          <div className="paper-lines" aria-hidden="true">
-            <span />
-            <span />
-            <span />
-          </div>
-        </div>
+      <div className="pdf-preview" aria-label="Rendered PDF preview">
+        <CompiledDocumentPreview compileState={compileState} document={compiledDocument} />
       </div>
 
-      <section className="agent-rail" aria-label="AI agent status">
-        <div className="agent-rail-heading">
-          <Bot aria-hidden="true" />
-          <div>
-            <p>AI diagram workflow</p>
-            <h3>{previewCopy?.detail ?? copy.detail}</h3>
+      {diagramPreview && previewCopy ? (
+        <section className="diagram-approval" aria-label="Diagram approval checkpoint" aria-live="polite">
+          <div className="diagram-approval-header">
+            <span className="diagram-approval-badge" data-state={diagramPreview.status}>
+              {previewCopy.label}
+            </span>
+            <p>{previewCopy.detail}</p>
           </div>
-        </div>
-        <ol className="event-list">
-          {events.map((event) => (
-            <li className="event-item" data-state={event.state} key={event.id}>
-              {getEventIcon(event.state)}
-              <div>
-                <strong>{event.label}</strong>
-                <span>{event.detail}</span>
+
+          <div className="diagram-approval-preview">
+            <strong>Preview to approve</strong>
+            <DiagramFigurePreview preview={diagramPreview} />
+          </div>
+
+          <div className="diagram-approval-question">
+            <strong>Does this match what you wanted?</strong>
+            <div className="diagram-approval-actions">
+              <button className="primary-button" disabled={diagramPreview.status !== "ready"} onClick={onKeepDiagram} type="button">
+                <CheckCircle2 aria-hidden="true" />
+                Keep Diagram
+              </button>
+              <button
+                className="secondary-button"
+                disabled={diagramPreview.status !== "ready"}
+                onClick={openRevisionForm}
+                type="button"
+              >
+                <RotateCcw aria-hidden="true" />
+                Request Changes
+              </button>
+              <button
+                className="danger-button"
+                disabled={diagramPreview.status !== "ready"}
+                onClick={onDiscardDiagram}
+                type="button"
+              >
+                <Trash2 aria-hidden="true" />
+                Discard
+              </button>
+            </div>
+          </div>
+          {diagramPreview.status === "changes-requested" ? (
+            <form className="diagram-revision-form" onSubmit={submitRevision}>
+              <label htmlFor={revisionFeedbackId}>What should change?</label>
+              <textarea
+                aria-describedby={revisionError ? revisionErrorId : undefined}
+                aria-invalid={Boolean(revisionError)}
+                id={revisionFeedbackId}
+                maxLength={revisionFeedbackMaxLength + 120}
+                onChange={(event) => {
+                  setRevisionFeedback(event.target.value);
+                  if (revisionError) {
+                    setRevisionError("");
+                  }
+                }}
+                placeholder="Example: Make the arrows curved and label the middle block as Layer update."
+                value={revisionFeedback}
+              />
+              <div className="field-meta">
+                <span id={revisionErrorId} aria-live="polite" className="field-error">
+                  {revisionError}
+                </span>
+                <span className={hasRevisionOverflow ? "character-count danger" : "character-count"}>
+                  {revisionFeedback.length}/{revisionFeedbackMaxLength}
+                </span>
               </div>
-            </li>
-          ))}
-        </ol>
-        {diagramPreview && previewCopy ? (
-          <section className="diagram-approval" aria-label="Diagram approval checkpoint" aria-live="polite">
-            <div className="diagram-approval-header">
-              <span className="diagram-approval-badge" data-state={diagramPreview.status}>
-                {previewCopy.label}
-              </span>
-              <p>{previewCopy.detail}</p>
-            </div>
-
-            <div className="diagram-change-summary">
-              <strong>Repair summary</strong>
-              <p>{diagramPreview.repairSummary}</p>
-              <ul>
-                {diagramPreview.changes.map((change) => (
-                  <li key={change}>{change}</li>
-                ))}
-              </ul>
-            </div>
-
-            <details className="diagram-source-preview">
-              <summary>
-                <SquareCode aria-hidden="true" />
-                Source preview
-              </summary>
-              <pre>{diagramPreview.source}</pre>
-            </details>
-
-            <div className="diagram-approval-question">
-              <strong>Does this match what you wanted?</strong>
-              <div className="diagram-approval-actions">
-                <button className="primary-button" disabled={diagramPreview.status !== "ready"} onClick={onKeepDiagram} type="button">
-                  <CheckCircle2 aria-hidden="true" />
-                  Keep Diagram
-                </button>
-                <button
-                  className="secondary-button"
-                  disabled={diagramPreview.status !== "ready"}
-                  onClick={openRevisionForm}
-                  type="button"
-                >
+              <div className="diagram-revision-actions">
+                <button className="primary-button" disabled={compileState === "running"} type="submit">
                   <RotateCcw aria-hidden="true" />
-                  Request Changes
-                </button>
-                <button
-                  className="danger-button"
-                  disabled={diagramPreview.status !== "ready"}
-                  onClick={onDiscardDiagram}
-                  type="button"
-                >
-                  <Trash2 aria-hidden="true" />
-                  Discard
+                  Revise Diagram
                 </button>
               </div>
-            </div>
-            {diagramPreview.status === "changes-requested" ? (
-              <form className="diagram-revision-form" onSubmit={submitRevision}>
-                <label htmlFor={revisionFeedbackId}>What should change?</label>
-                <textarea
-                  aria-describedby={revisionError ? revisionErrorId : undefined}
-                  aria-invalid={Boolean(revisionError)}
-                  id={revisionFeedbackId}
-                  maxLength={revisionFeedbackMaxLength + 120}
-                  onChange={(event) => {
-                    setRevisionFeedback(event.target.value);
-                    if (revisionError) {
-                      setRevisionError("");
-                    }
-                  }}
-                  placeholder="Example: Make the arrows curved and label the middle block as Layer update."
-                  value={revisionFeedback}
-                />
-                <div className="field-meta">
-                  <span id={revisionErrorId} aria-live="polite" className="field-error">
-                    {revisionError}
-                  </span>
-                  <span className={hasRevisionOverflow ? "character-count danger" : "character-count"}>
-                    {revisionFeedback.length}/{revisionFeedbackMaxLength}
-                  </span>
-                </div>
-                <div className="diagram-revision-actions">
-                  <button className="primary-button" disabled={compileState === "running"} type="submit">
-                    <RotateCcw aria-hidden="true" />
-                    Revise Diagram
-                  </button>
-                </div>
-              </form>
-            ) : null}
-          </section>
-        ) : null}
-      </section>
+            </form>
+          ) : null}
+        </section>
+      ) : null}
     </aside>
   );
 };
 
-const EmptyFigurePreview = () => (
-  <div className="figure-placeholder">
-    <FileText aria-hidden="true" />
-    <span>Compiled figure preview appears here</span>
-  </div>
-);
+const CompiledDocumentPreview = ({
+  compileState,
+  document
+}: {
+  compileState: CompileState;
+  document: LatexCompilePreview | null;
+}) => {
+  if (document?.succeeded && document.pdfDataUrl) {
+    return <iframe className="pdf-frame" src={document.pdfDataUrl} title="Compiled LaTeX PDF preview" />;
+  }
+
+  if (compileState === "error" && document) {
+    return (
+      <section className="compile-error-panel" aria-label="LaTeX compile errors">
+        <strong>{document.timedOut ? "Compile timed out" : "Compile failed"}</strong>
+        <pre>{getCompileFailureText(document)}</pre>
+      </section>
+    );
+  }
+
+  return (
+    <div className="figure-placeholder">
+      <FileText aria-hidden="true" />
+      <span>Press Compile to render the current LaTeX document.</span>
+    </div>
+  );
+};
+
+const getCompileFailureText = (document: LatexCompilePreview) => {
+  const log = document.errorSummary || document.compileLog || document.stderr || document.stdout || "No compiler output was captured.";
+
+  return log.slice(0, 5000);
+};
+
+const normalizeLatexText = (text: string) =>
+  text
+    .replace(/%.*$/gm, " ")
+    .replace(/\[([^\]]+)\]\(mailto:([^)]+)\)/g, "$1")
+    .replace(/\\LaTeX\{\}/g, "LaTeX")
+    .replace(/\\textbf\{([^{}]*)\}/g, "$1")
+    .replace(/\\texttt\{([^{}]*)\}/g, "$1")
+    .replace(/\\emph\{([^{}]*)\}/g, "$1")
+    .replace(/\\vspace\{[^{}]*\}/g, " ")
+    .replace(/\\(?:quad|qquad|,|;|:|!)/g, " ")
+    .replace(/\\[a-zA-Z]+\*?(?:\[[^\]]*\])?\{([^{}]*)\}/g, "$1")
+    .replace(/\\[a-zA-Z]+\*?/g, "")
+    .replace(/\\+/g, " ")
+    .replace(/\$\$?[^$]*\$\$?/g, " ")
+    .replace(/\\\[[\s\S]*?\\\]/g, " ")
+    .replace(/(^|\s)\[[^\]]+\](?=\s|$)/g, " ")
+    .replace(/[{}]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
 
 const DiagramFigurePreview = ({ preview }: { preview: DiagramPreviewApproval }) => (
   <figure className="compiled-diagram-preview" aria-label={preview.accessibleSummary}>
-    <figcaption>
-      <span>{preview.artifactPath}</span>
-      <strong>{preview.prompt}</strong>
-    </figcaption>
     <div className="diagram-flow" aria-hidden="true">
-      <div className="diagram-node input">Token embeddings</div>
-      <div className="diagram-link" />
-      <div className="diagram-node attention">Multi-head attention</div>
-      <div className="diagram-link" />
-      <div className="diagram-node mlp">Feed-forward block</div>
-      <div className="diagram-link" />
-      <div className="diagram-node output">Logits</div>
+      {extractTikzNodeLabels(preview.source).map((label, index, labels) => (
+        <Fragment key={`${label}-${index}`}>
+          <div className={`diagram-node ${diagramNodeClassNames[index % diagramNodeClassNames.length]}`}>{label}</div>
+          {index < labels.length - 1 ? <div className="diagram-link" /> : null}
+        </Fragment>
+      ))}
     </div>
-    <p>{preview.accessibleSummary}</p>
   </figure>
 );
+
+const diagramNodeClassNames = ["input", "attention", "mlp", "output", "input"];
+const fallbackDiagramLabels = ["Generated source", "Compile checkpoint", "Approval"];
+
+const extractTikzNodeLabels = (source: string) => {
+  const labels = Array.from(source.matchAll(/\\node(?:\[[^\]]*\])?(?:\s*\([^)]*\))?\s*\{([^{}]+)\}/g))
+    .map((match) => normalizeLatexText(match[1] ?? ""))
+    .filter(Boolean)
+    .slice(0, 5);
+
+  return labels.length ? labels : fallbackDiagramLabels;
+};

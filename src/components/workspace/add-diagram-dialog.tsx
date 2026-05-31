@@ -77,7 +77,7 @@ export const AddDiagramDialog = ({ isOpen, onClose, onSubmit }: AddDiagramDialog
 
   const [prompt, setPrompt] = useState("");
   const [stylePreset, setStylePreset] = useState<DiagramStylePreset>("academic");
-  const [outputTarget, setOutputTarget] = useState<DiagramOutputTarget>("inline");
+  const [outputTarget, setOutputTarget] = useState<DiagramOutputTarget>("replace-placeholder");
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -149,7 +149,7 @@ export const AddDiagramDialog = ({ isOpen, onClose, onSubmit }: AddDiagramDialog
               <Bot aria-hidden="true" />
             </span>
             <div>
-              <p>AI diagram workflow</p>
+              <p>Diagram generation</p>
               <h2 id={titleId}>Add diagram</h2>
             </div>
           </div>

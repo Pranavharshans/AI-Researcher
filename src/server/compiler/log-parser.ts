@@ -157,6 +157,10 @@ const normalizeError = (rawMessage: string): LatexNormalizedErrorType => {
     return "undefined_control_sequence";
   }
 
+  if (/Package xcolor Error: Undefined color [`'][^`']+[`']/.test(rawMessage)) {
+    return "undefined_xcolor_color";
+  }
+
   if (/File [`'][^`']+\.sty[`'] not found/.test(rawMessage)) {
     return "missing_package";
   }
@@ -200,6 +204,11 @@ const createHints = (rawMessage: string, normalizedType: LatexNormalizedErrorTyp
 
   if (normalizedType === "undefined_control_sequence") {
     return ["Check for a misspelled command or a missing LaTeX package."];
+  }
+
+  if (normalizedType === "undefined_xcolor_color") {
+    const colorName = rawMessage.match(/Undefined color [`']([^`']+)[`']/)?.[1];
+    return colorName ? [`Color '${colorName}' is not defined by xcolor; replace it with a standard LaTeX color or define it.`] : ["Replace the undefined color with a standard LaTeX color or define it."];
   }
 
   if (normalizedType === "missing_package") {

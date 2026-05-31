@@ -63,6 +63,17 @@ const missingLibraryErrors = parseLatexLog(
 assert.equal(missingLibraryErrors[0].normalizedType, "missing_tikz_library");
 assert.match(missingLibraryErrors[0].hints.join(" "), /\\usetikzlibrary\{positioning\}/);
 
+const undefinedColorErrors = parseLatexLog(
+  [
+    "! Package xcolor Error: Undefined color `amber'.",
+    "l.4 ... fill=amber!10] (mlp) {Feed-forward block};"
+  ].join("\n"),
+  { source, sourceFilePath: "figures/generated/diagram_001.tex" }
+);
+
+assert.equal(undefinedColorErrors[0].normalizedType, "undefined_xcolor_color");
+assert.match(undefinedColorErrors[0].hints.join(" "), /standard LaTeX color/);
+
 const unknownNodeErrors = parseLatexLog(
   [
     "! Package pgf Error: No shape named `encoder' is known.",
